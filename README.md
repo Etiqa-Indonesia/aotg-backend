@@ -1,0 +1,3 @@
+-- Use NPM Install First
+-- The Backend also Add 3rd Party Name "Care"
+-- "NPM Start" To run this App 
