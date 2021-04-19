@@ -13,6 +13,10 @@ module.exports = app => {
     router.put("/quotes/:id/uploadleftview",checktoken, quote.uploadLeftView);
     router.put("/quotes/:id/uploadrightview",checktoken, quote.uploadRightView);
     router.get("/quote/:id",checktoken, quote.getQuotebyPK);
+    router.get("/quote/backimage/:id",checktoken, quote.getImageBackView);
+    router.get("/quote/frontimage/:id",checktoken, quote.getImageFrontView);
+    router.get("/quote/leftimage/:id",checktoken, quote.getImageLeftView);
+    router.get("/quote/rightimage/:id",checktoken, quote.getImageRightView);
 
     //Prefix
     app.use("/motor", router);

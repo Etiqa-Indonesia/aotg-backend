@@ -1,16 +1,16 @@
 const db = require("../models");
 const Quote = db.Quotation;
 const Op = db.Sequelize.Op;
-const {createCoverageDetail,createQuote, 
+const { createCoverageDetail,createQuote, 
     createQuoteLog, createQuoteDetail, 
     updateFrontView, updateBackView, updateLeftView, updateRightView,
-     createorupdateCustomer, updateCustomerQuotation , getQuotebyPK} = require("../services/quotation.service")
-// const FormData = require('form-data')
-// require('../models/care/motor.model');
+     createorupdateCustomer, updateCustomerQuotation , getQuotebyPK, getImagebyPK } = require("../services/quotation.service");
+const { createResponseLog } = require("../services/responselog.service");
 const multer = require('multer');
 const path = require("path");
 const fs = require('fs');
-const { create } = require("domain");
+const url = require('url');
+const maxSize = 4 * 1024 * 1024;
 
 const DIRFRONT = path.join(__dirname, '../../uploads/frontview');
 const DIRBACK = path.join(__dirname, '../../uploads/backview');
@@ -44,6 +44,12 @@ exports.CreateQuote = async (req, res) =>{
     var EndDate = d.setFullYear(d.getFullYear() + 1);
     var customerresult;
     // console.log(Datenow);
+
+    var urlobj = url.parse(req.originalUrl);
+    urlobj.protocol = req.protocol;
+    urlobj.host = req.get('host');
+    var requrl = url.format(urlobj);
+    
 
     const dataQuotes = {
         CustomerID : req.body.customerid,
@@ -79,6 +85,14 @@ exports.CreateQuote = async (req, res) =>{
         ChassisNo  : VehicleDetails.chassis_number,
         Year  : VehicleDetails.manufactured_year
     };
+    const DataLog = {
+        QuotationID : null,
+        URL : requrl,
+        isError : 0,
+        Param  :JSON.stringify(req.body) ,
+        StatusCode  : 200,
+        Response  : null
+    };
     const dataCustomer = {
         // CustomerID : null,
         CustomerName : Customer.name,
@@ -94,44 +108,64 @@ exports.CreateQuote = async (req, res) =>{
         ZipCode : Customer.zipcode,
         AgentID : req.body.agentid
     };
-    // console.log(req.body.model) ;
 
-     createQuote(dataQuotes, async (err,results) => {
-        if (err) {
-            return res.json({
-                message: err 
-            });
-        }
-        else{
-            try {
-                createorupdateCustomer(dataCustomer,(err,resultsC) => {
-                    // console.log(results);
-                    updateCustomerQuotation(results.QuotationID, resultsC);
-                    customerresult = resultsC;
-
-                    // results.CustomerID = resultsC;
-
+    if (Customer.name == undefined) {
+        res.status(201).json({
+            success: false,
+            message: 'Data Customer Kosong'
+        });
+    }
+    if (VehicleDetails.brand == undefined) {
+        
+        res.status(201).json({
+            success: false,
+            message: 'Data Kendaraan Kosong'
+        });
+    }
+    else {
+        createQuote(dataQuotes, async (err,results) => {
+            if (err) {
+                return res.json({
+                    message: err 
                 });
-                dataVehicle.QuotationID = results.QuotationID;
-                createQuoteDetail(dataVehicle);
-                createQuoteLog(results);
-                
-                createCoverageDetail(PremiumDetails,results.QuotationID,
-                    req.body.sum_insured_1,req.body.discount_pct);
-
-                results.CustomerID = customerresult;
-               await res.status(200).send({
-                    results
-                });
-
-            } catch (error) {
+            }
+            else{
+                try {
+                    createorupdateCustomer(dataCustomer,(err,resultsC) => {
+                        // console.log(results);
+                        updateCustomerQuotation(results.QuotationID, resultsC);
+                        customerresult = resultsC;
+    
+                        // results.CustomerID = resultsC;
+    
+                    });
+                    dataVehicle.QuotationID = results.QuotationID;
+                    DataLog.QuotationID = results.QuotationID;
+                    DataLog.Response = JSON.stringify(results);
+                    createResponseLog(DataLog);
+                    createQuoteDetail(dataVehicle);
+                    createQuoteLog(results);
+                    
+                    createCoverageDetail(PremiumDetails,results.QuotationID,
+                        req.body.sum_insured_1,req.body.discount_pct);
+    
+                    // results.CustomerID = customerresult;
+                   await res.status(200).send({
+                        results
+                    });
+    
+                } catch (error) {
+                    
+                }
                 
             }
-            
-        }
+    
+        });
+    
 
-    });
+    }
 
+     
 };
 
 exports.uploadFrontView = (req, res) => {
@@ -146,10 +180,15 @@ exports.uploadFrontView = (req, res) => {
         }
       })
        
-    var upload = multer({ storage: storage }).single('frontFile')
+    var upload = multer({ 
+        storage: storage,
+        limits: { fileSize: maxSize }
+    }).single('frontFile');
     upload(req, res, function (err) {
         if (err) {
-            // An error occurred when uploading
+            return res.status(500).send({
+                message: "File size cannot be larger than 4MB!",
+              });
         }
         
         if (req.file != null || undefined) {
@@ -183,10 +222,15 @@ exports.uploadBackView = (req, res) => {
         }
       })
        
-    var upload = multer({ storage: storage }).single('backFile')
+    var upload = multer({ 
+        storage: storage,
+        limits: { fileSize: maxSize }
+    }).single('backFile');
     upload(req, res, function (err) {
         if (err) {
-            // An error occurred when uploading
+            return res.status(500).send({
+                message: "File size cannot be larger than 4MB!",
+              });
         }
         if (req.file != null || undefined) {
             const filePath = req.file.path;
@@ -217,10 +261,15 @@ exports.uploadLeftView = (req, res) => {
         }
       })
        
-    var upload = multer({ storage: storage }).single('leftFile')
+      var upload = multer({ 
+        storage: storage,
+        limits: { fileSize: maxSize }
+    }).single('leftFile');
     upload(req, res, function (err) {
         if (err) {
-            // An error occurred when uploading
+            return res.status(500).send({
+                message: "File size cannot be larger than 4MB!",
+              });
         }
         
         if (req.file != null || undefined) {
@@ -250,11 +299,16 @@ exports.uploadRightView = (req, res) => {
             cb(null, id +"_"+ file.originalname )
         }
       })
-       
-    var upload = multer({ storage: storage }).single('rightFile')
+      
+    var upload = multer({ 
+        storage: storage,
+        limits: { fileSize: maxSize }
+    }).single('rightFile');
     upload(req, res, function (err) {
         if (err) {
-            // An error occurred when uploading
+            return res.status(500).send({
+                message: "File size cannot be larger than 4MB!",
+              });
         }
         
         if (req.file != null || undefined) {
@@ -272,4 +326,77 @@ exports.uploadRightView = (req, res) => {
         }
     })
     
+};
+
+exports.getImageBackView = async (req, res) => {
+
+    const datasend = {
+        QuotationID:  req.params.id
+    };
+
+    getImagebyPK(datasend, (err,results) => {
+        if (err) {
+            return res.json({
+                message: err 
+            });
+        }
+        else{
+            var filepath = results.BackPath;
+            res.sendFile(filepath);
+        }
+    });
+};
+exports.getImageFrontView = async (req, res) => {
+
+    const datasend = {
+        QuotationID:  req.params.id
+    };
+
+    getImagebyPK(datasend, (err,results) => {
+        if (err) {
+            return res.json({
+                message: err 
+            });
+        }
+        else{
+            var filepath = results.FrontPath;
+            res.sendFile(filepath);
+        }
+    });
+};
+exports.getImageLeftView = async (req, res) => {
+
+    const datasend = {
+        QuotationID:  req.params.id
+    };
+
+    getImagebyPK(datasend, (err,results) => {
+        if (err) {
+            return res.json({
+                message: err 
+            });
+        }
+        else{
+            var filepath = results.LeftPath;
+            res.sendFile(filepath);
+        }
+    });
+};
+exports.getImageRightView = async (req, res) => {
+
+    const datasend = {
+        QuotationID:  req.params.id
+    };
+
+    getImagebyPK(datasend, (err,results) => {
+        if (err) {
+            return res.json({
+                message: err 
+            });
+        }
+        else{
+            var filepath = results.RightPath;
+            res.sendFile(filepath);
+        }
+    });
 };

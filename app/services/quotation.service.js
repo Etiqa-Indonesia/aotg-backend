@@ -116,6 +116,42 @@ module.exports = {
             });
 
     },
+    getImagebyPK: async (data, callback) => {
+        Quote.hasOne(QuoteDetailMV, { foreignKey: 'QuotationID' });
+      await Quote.findAll(
+            {
+                where: data,
+                raw: true,
+                include: [{
+                    model: QuoteDetailMV,
+                    attributes: { exclude: ['QuotationID'] }
+
+                }
+                ],
+                attributes: { exclude: ['CreateDate', 'UpdateDate'] },
+
+            })
+            .then((data) => {
+                if (data != null) {
+                    try {
+                        var ImagePath = {
+                            FrontPath  : data[0]['QuoDetailMV.FrontView'],
+                            LeftPath  : data[0]['QuoDetailMV.LeftView'],
+                            RightPath  : data[0]['QuoDetailMV.RightView'],
+                            BackPath  : data[0]['QuoDetailMV.BackView']
+                        } 
+                        return  callback(null, ImagePath);
+                    }
+                    catch (error) {
+                        return  callback(error);
+                    }
+                }
+                // return callback(err, data);
+            }).catch((error) => {
+                return callback(error);
+            });
+
+    },
     createQuote: async (data, callback) => {
        await Quote.create(data)
             .then((res) => {
@@ -165,7 +201,6 @@ module.exports = {
                 }).catch((err) => {
                 });
         };
-
     },
     updateCustomerQuotation: async (id, data) => {
         // console.log(id,data);

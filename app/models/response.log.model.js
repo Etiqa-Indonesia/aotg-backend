@@ -2,6 +2,7 @@ module.exports = (sequelize, Sequelize) => {
     const ResponseLog = sequelize.define("ResponseLog", {
         LogID: {
             type: Sequelize.INTEGER,
+            autoIncrement: true,
             primaryKey: true
         },
         QuotationID: {
@@ -10,7 +11,8 @@ module.exports = (sequelize, Sequelize) => {
         },
         CreateDate: {
             allowNull: true,
-            type: Sequelize.DATE
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW
         },
         URL: {
             allowNull: true,

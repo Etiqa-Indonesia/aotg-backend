@@ -31,11 +31,13 @@ try {
     console.error('Unable to connect to the database:', error);
   }
 // parse requests of content-type - application/json
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '2mb'}));
 
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '4mb'  }));
+
+// app.use(express.limit('3M'));
 
 // Sync database
 //  db.sequelize.authenticate();
