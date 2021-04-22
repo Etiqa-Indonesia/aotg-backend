@@ -17,6 +17,10 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: true,
             type: Sequelize.STRING(1)
         },
+        Branch: {
+            allowNull: true,
+            type: Sequelize.STRING(30)
+        },
         IDType: {
             allowNull: true,
             type: Sequelize.STRING(1)

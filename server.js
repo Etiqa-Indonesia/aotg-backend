@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const helmet = require('helmet');
 // const http = require("http");
 
 // Models
@@ -21,6 +22,7 @@ let corsOptions = {
 
 // var server = http.createServer(app);
 app.use(cors(corsOptions));
+app.use(helmet());
 
 app.use(express.static(__dirname + '/uploads'));
 
@@ -31,11 +33,11 @@ try {
     console.error('Unable to connect to the database:', error);
   }
 // parse requests of content-type - application/json
-app.use(bodyParser.json({limit: '2mb'}));
+app.use(bodyParser.json({limit: '25mb'}));
 
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false, limit: '4mb'  }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '25mb'  }));
 
 // app.use(express.limit('3M'));
 

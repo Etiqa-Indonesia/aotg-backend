@@ -26,7 +26,8 @@ exports.createUser = (req, res) => {
         UserName: req.body.UserName,
         AgentID: req.body.AgentID,
         Password: HasPassword,
-        Role: req.body.Role 
+        Role: req.body.Role,
+        isActive : 1 
     };
 
     // Save Post in the database
@@ -59,7 +60,6 @@ exports.createAgent = (req, res) => {
     var IDType = {"KTP": "1", "Passport": "2"}
 
     // Create a Post
-   
     const post = {
         Name : req.body.Name,
         IDType: IDType[req.body.IDType],
@@ -75,7 +75,9 @@ exports.createAgent = (req, res) => {
         Address : req.body.Address,
         City : req.body.City,
         Status : "1",
-        JoinedDate : req.body.JoinedDate
+        JoinedDate : req.body.JoinedDate,
+        Type : "1",
+        Address : req.body.Address
     };
 
     // Save Post in the database

@@ -2,6 +2,7 @@ var http = require('../http')
 
 const AUTOAPI = '/auto/api'
 const MOTORAPI = '/aotg/motor/api'
+const AOTG = '/aotg'
 
 const listing_client = {
   fetchProducts () {
@@ -45,6 +46,21 @@ const quote_client = {
   },
   calculatePremium (payload) {
     return http.post(`${MOTORAPI}/quotes/calculate_premium`, payload)
+  },
+  saveSysUser (payload) {
+    const data = http.post(`${AOTG}/save_sys_user`, payload)
+    // return http.post(`${AOTG}/save_sys_user`, payload)
+    return data
+  },
+  savePolicy (payload) {
+    const data = http.post(`${AOTG}/save_policy`, payload)
+    // return http.post(`${AOTG}/save_sys_user`, payload)
+    return data
+  },
+  submitPolicy (payload) {
+    const data = http.post(`${AOTG}/submit_policy`, payload)
+    // return http.post(`${AOTG}/save_sys_user`, payload)
+    return data
   }
   // testget (payload) {
   //   return http.post('http://192.168.112.100/WebAPI/MiddlewareAPI/SearchProduct', payload)

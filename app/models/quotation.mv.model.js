@@ -55,7 +55,11 @@ module.exports = (sequelize, Sequelize) => {
         BackView: {
             allowNull: true,
             type: Sequelize.STRING(250)
-        }    
+        },
+        InsideView: {
+            allowNull: true,
+            type: Sequelize.STRING(250)
+        }        
 
     });
 

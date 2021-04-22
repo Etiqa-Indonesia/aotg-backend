@@ -1,0 +1,30 @@
+const SaveUser = {
+    ID: null,
+    Address_1: null,
+    Address_2: null,
+    Address_3: null,
+    ZipCode: null,
+    AllowedF: true,
+    LockedF: false,
+    BirthDate: "2021-04-20",
+    BirthPlace: null,
+    City: null,
+    Country: null,
+    Email: null,
+    Gender: null,
+    ID_Name: null,
+    ID_No: null,
+    ID_Type: null,
+    Initial: null,
+    Mobile: null,
+    Name: null,
+    Phone: null,
+    RefID: null,
+    RefName: null,
+    Role: "CLIENT",
+    TaxID: null,
+    Type: "COMMON",
+    ASource: "EII-POLICY"
+}
+
+module.exports = SaveUser

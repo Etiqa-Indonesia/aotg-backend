@@ -76,6 +76,30 @@ module.exports = (sequelize, Sequelize) => {
         ANO: {
             allowNull: true,
             type: Sequelize.INTEGER
+        },
+        IsSubmittedCare: {
+            allowNull: true,
+            type: Sequelize.INTEGER
+        },
+        RefferenceNumber: {
+            allowNull: true,
+            type: Sequelize.STRING(50)
+        },
+        EfilePath: {
+            allowNull: true,
+            type: Sequelize.STRING(500)
+        },
+        MailSent: {
+            allowNull: true,
+            type: Sequelize.INTEGER
+        },
+        MailFetchTries: {
+            allowNull: true,
+            type: Sequelize.INTEGER
+        },
+        CarePolicyID: {
+            allowNull: true,
+            type: Sequelize.INTEGER
         }
 
     });

@@ -15,7 +15,11 @@ module.exports = {
     privatekey: "3A7A616F48A944A5",
     publickey : "FEF492B8A11CE69B",
     // frontView_Upload :'/home/etiqa/eii_dsp/uploaded_chassis'
-    motorproductid : "0201"
+    motorproductid : "0201",
+    saveUserCareURl : "http://192.168.112.100/WebAPI/MiddlewareAPI/SaveSysUser",
+    savePolicyCareURL : "http://192.168.112.100/WebAPI/MiddlewareAPI/SavePolicy",
+    submitPolicyCareURL : "http://192.168.112.100/WebAPI/MiddlewareAPI/SubmitPolicy",
+    efilePolicyCareURL : "http://192.168.112.100/WebAPI/MiddlewareAPI/EFile"
 
     
 };
