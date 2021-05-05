@@ -1,6 +1,5 @@
 const { sequelize,Sequelize } = require("../models");
 const db = require("../models");
-const { use } = require("../routes/motor/product");
 const User = db.User;
 const Agent = db.Agent;
 const Quote = db.Quotation;

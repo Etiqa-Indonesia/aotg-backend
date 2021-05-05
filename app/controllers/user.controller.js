@@ -144,13 +144,13 @@ exports.getLogin =(req, res) => {
                 } else {
                     // const result = null;
                     results.Password = undefined;
-                    const toToken = results.AgentID + results.UserID;
+                    const toToken = results.AgentID + results.UserID ;
 
                     const jsontoken =sign({toToken}, dbkey.key, {
                         expiresIn: "1h"
                     });
                     return res.json({
-                        succes: true,
+                        success: true,
                         message: "Sukses Login",
                         user : results,
                         token : jsontoken

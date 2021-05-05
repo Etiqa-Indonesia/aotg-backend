@@ -7,7 +7,9 @@ module.exports = {
        await ResponseLog.create(data)
         .then((res) => {
         }).catch((err) => {
+            console.log(err)
 
         });
     }
 }
+

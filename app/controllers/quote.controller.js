@@ -5,8 +5,9 @@ const { createCoverageDetail, createQuote,
     createQuoteLog, createQuoteDetail,
     updateFrontView, updateBackView, updateLeftView, updateRightView,
     createorupdateCustomer, updateCustomerQuotation,
-    getQuotebyPK, getImagebyPK, ApproveQuoteByPK, updateInsideView , 
-    updateQuotationforPolicy, updateQuotationforSubmitPolicy} = require("../services/quotation.service");
+    getQuotebyPK, getImagebyPK, ApproveQuoteByPK, updateInsideView,
+    updateQuotationforPolicy, updateQuotationforSubmitPolicy,
+    updateQuotation, updateQuoteDetail, updateCoverageDetail } = require("../services/quotation.service");
 const { createResponseLog } = require("../services/responselog.service");
 const { SaveUser, SavePolicy, SubmitPolicy } = require("../services/care.service");
 const multer = require('multer');
@@ -23,6 +24,7 @@ const DIRLEFT = path.join(__dirname, '../../uploads/leftview');
 const DIRRIGHT = path.join(__dirname, '../../uploads/rightview');
 const DIRINSIDE = path.join(__dirname, '../../uploads/insideview');
 const config = require('../config/db.config');
+
 
 
 var Datenow = new Date().toLocaleString();
@@ -74,7 +76,7 @@ exports.ApproveQuote = async (req, res) => {
     urlobj.protocol = req.protocol;
     urlobj.host = req.get('host');
     var requrl = url.format(urlobj);
-    
+
     ApproveQuoteByPK(datasend, (err, results) => {
         if (err) {
             return res.json({
@@ -106,13 +108,13 @@ exports.ApproveQuote = async (req, res) => {
                             SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
                                 req.params.id, results.PolicyData, config.savePolicyCareURL);
                             const paramUpdate = {
-                                PolicyNo : ResponseCarePolicy.Data[0].PolicyNo,
-                                RefferenceNumber : ResponseCarePolicy.Data[0].RefNo,
-                                CarePolicyID : ResponseCarePolicy.Data[0].PID
+                                PolicyNo: ResponseCarePolicy.Data[0].PolicyNo,
+                                RefferenceNumber: ResponseCarePolicy.Data[0].RefNo,
+                                CarePolicyID: ResponseCarePolicy.Data[0].PID
                             }
-                            updateQuotationforPolicy(req.params.id,paramUpdate);
+                            updateQuotationforPolicy(req.params.id, paramUpdate);
                             const paramSubmitPolicy = {
-                                PID : ResponseCarePolicy.Data[0].PID
+                                PID: ResponseCarePolicy.Data[0].PID
                             }
 
                             SubmitPolicy(JSON.stringify(paramSubmitPolicy), (err, resultSubPolicy) => {
@@ -126,11 +128,11 @@ exports.ApproveQuote = async (req, res) => {
                                     SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
                                         req.params.id, paramSubmitPolicy, config.submitPolicyCareURL);
                                     const paramUpdate = {
-                                        IsSubmittedCare : 1
+                                        IsSubmittedCare: 1
                                     }
-                                    updateQuotationforSubmitPolicy(req.params.id,paramUpdate);
+                                    updateQuotationforSubmitPolicy(req.params.id, paramUpdate);
                                 }
-        
+
                             });
                         }
 
@@ -138,7 +140,7 @@ exports.ApproveQuote = async (req, res) => {
                 }
             });
             res.status(200).send({
-                status : 200,
+                status: 200,
                 message: 'Quotation berhasil di Approve, Tunggu beberapa menit hingga File Polis terkirim'
             });
         }
@@ -160,6 +162,8 @@ exports.CreateQuote = async (req, res) => {
     urlobj.protocol = req.protocol;
     urlobj.host = req.get('host');
     var requrl = url.format(urlobj);
+
+    const QuotationID = req.body.quotationid;
 
     const dataQuotes = {
         CustomerID: req.body.customerid,
@@ -245,44 +249,87 @@ exports.CreateQuote = async (req, res) => {
         });
     }
     else {
-        createQuote(dataQuotes, async (err, results) => {
-            if (err) {
-                return res.json({
-                    message: err
-                });
-            }
-            else {
-                try {
+        if (QuotationID != null) {
+            updateQuotation(QuotationID, dataQuotes, async (err, results) => {
+                if (err) {
+                    return res.json({
+                        message: err
+                    });
+                }
+                else {
                     createorupdateCustomer(dataCustomer, (err, resultsC) => {
                         // console.log(results);
-                        updateCustomerQuotation(results.QuotationID, resultsC);
+                        updateCustomerQuotation(QuotationID, resultsC);
                         customerresult = resultsC;
 
                         // results.CustomerID = resultsC;
 
                     });
-                    dataVehicle.QuotationID = results.QuotationID;
-                    DataLog.QuotationID = results.QuotationID;
-                    DataLog.Response = JSON.stringify(results);
-                    createResponseLog(DataLog);
-                    createQuoteDetail(dataVehicle);
-                    createQuoteLog(results);
+                    const DataUpdate = {
+                        Message: "Update Data Quotation " + QuotationID,
+                        data: req.body
+                    }
 
-                    createCoverageDetail(PremiumDetails, results.QuotationID,
+                    dataVehicle.QuotationID = QuotationID;
+                    DataLog.QuotationID = QuotationID;
+                    DataLog.Response = JSON.stringify(DataUpdate);
+
+                    createResponseLog(DataLog);
+                    updateQuoteDetail(dataVehicle);
+                    createQuoteLog(dataVehicle);
+
+                    updateCoverageDetail(PremiumDetails, QuotationID,
                         req.body.sum_insured_1, req.body.discount_pct);
 
-                    // results.CustomerID = customerresult;
-                    await res.status(200).send({
-                        results
-                    });
 
-                } catch (error) {
+                    res.status(200).send({
+                        data : req.body
+                    });
+                }
+
+            });
+
+        } else {
+            createQuote(dataQuotes, async (err, results) => {
+                if (err) {
+                    return res.json({
+                        message: err
+                    });
+                }
+                else {
+                    try {
+                        createorupdateCustomer(dataCustomer, (err, resultsC) => {
+                            // console.log(results);
+                            updateCustomerQuotation(results.QuotationID, resultsC);
+                            customerresult = resultsC;
+
+                            // results.CustomerID = resultsC;
+
+                        });
+                        dataVehicle.QuotationID = results.QuotationID;
+                        DataLog.QuotationID = results.QuotationID;
+                        DataLog.Response = JSON.stringify(results);
+                        createResponseLog(DataLog);
+                        createQuoteDetail(dataVehicle);
+                        createQuoteLog(results);
+
+                        createCoverageDetail(PremiumDetails, results.QuotationID,
+                            req.body.sum_insured_1, req.body.discount_pct);
+
+                        // results.CustomerID = customerresult;
+                        await res.status(200).send({
+                            results
+                        });
+
+                    } catch (error) {
+
+                    }
 
                 }
 
-            }
+            });
+        }
 
-        });
 
     }
 };

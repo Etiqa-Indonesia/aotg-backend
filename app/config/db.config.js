@@ -19,7 +19,11 @@ module.exports = {
     saveUserCareURl : "http://192.168.112.100/WebAPI/MiddlewareAPI/SaveSysUser",
     savePolicyCareURL : "http://192.168.112.100/WebAPI/MiddlewareAPI/SavePolicy",
     submitPolicyCareURL : "http://192.168.112.100/WebAPI/MiddlewareAPI/SubmitPolicy",
-    efilePolicyCareURL : "http://192.168.112.100/WebAPI/MiddlewareAPI/EFile"
+    efilePolicyCareURL : "http://192.168.112.100/WebAPI/MiddlewareAPI/EFile",
 
-    
+    mailHost: "smtp.gmail.com",
+    mailPort: 587,
+    mailSecure: false,
+    mailUser : 'etiqanoreply@gmail.com',
+    mailPass : '2WSX3edc'
 };

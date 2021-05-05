@@ -27,5 +27,14 @@ module.exports = {
         }).catch((error) => {
             return callback(error);
         });
+    },
+    RetrieveFile: async (data, callback) => {
+        await mw.eFIle(data)
+        .then((data) => {
+            return callback(null, data)
+
+        }).catch((error) => {
+            return callback(error);
+        });
     }
 }

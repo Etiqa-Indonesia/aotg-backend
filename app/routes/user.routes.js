@@ -12,7 +12,7 @@ module.exports = app => {
     router.get("/:id",checktoken, user.findUser);
 
     router.post("/login",  user.getLogin);
-    router.post("/test",  testSendMail);
+    // router.post("/test",  testSendMail);
 
     //Prefix
     app.use("/api/user", router);

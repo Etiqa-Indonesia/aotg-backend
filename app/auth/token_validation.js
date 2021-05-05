@@ -8,11 +8,15 @@ module.exports= {
             token = token.slice(7);
             verify(token, dbkey.key, (err, decode) => {
                 if (err) {
-                    res.json({
+                    res.status(400).send({
                         success: 0,
                         message: "Invalid Token"
-       
                     });
+                    // res.json({
+                    //     success: 0,
+                    //     message: "Invalid Token"
+       
+                    // });
                 }
                 else{
                    next(); 

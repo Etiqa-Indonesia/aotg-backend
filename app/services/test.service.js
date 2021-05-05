@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const fs = require('fs')
 
 var transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -16,18 +17,18 @@ var transporter = nodemailer.createTransport({
     subject: 'Sending Email using Node.js',
     text: 'That was easy!'
   };
+
 const sendmail = {
     testSendMail(){
         transporter.sendMail(mailOptions, function(error, info){
             if (error) {
               console.log(error);
             } else {
-              return ('Email sent: ' + info.response);
+              return (console.log('Email sent: ' + info.response));
             }
           });
 
     } 
-
 }
 
 module.exports = sendmail

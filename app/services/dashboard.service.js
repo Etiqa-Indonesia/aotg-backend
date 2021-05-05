@@ -2,6 +2,7 @@ const db = require("../models");
 const Quote = db.Quotation;
 const Op = db.Sequelize.Op;
 const Agent = db.Agent;
+const Customer = db.Customer;
 
 module.exports = {
     getMotorDashboard: async (data, role, callback) => {
@@ -11,10 +12,10 @@ module.exports = {
                     raw: true,
                     attributes: [
                         [db.sequelize.fn('COUNT', db.sequelize.col('Status')), 'count'],
-                        [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'NEW' 
-                        WHEN Status = '2' THEN 'CANCELLED' ELSE 'IN PROGRESS' END`), 'StatusQuo'],
+                        [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
+                        WHEN Status = '2' THEN 'Quote Cancel' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                     ],
-                    group: ['TOC', 'Status', 'AgentID', 'StatusQuo'],
+                    group: ['TOC', 'Status', 'AgentID', 'StatusQuote'],
                 })
                 .then((data) => {
                     if (data != null) {
@@ -37,10 +38,10 @@ module.exports = {
                     raw: true,
                     attributes: [
                         [db.sequelize.fn('COUNT', db.sequelize.col('Status')), 'count'],
-                        [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'NEW' 
-                        WHEN Status = '2' THEN 'CANCELLED' ELSE 'IN PROGRESS' END`), 'StatusQuo'],
+                        [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
+                        WHEN Status = '2' THEN 'Quote Cancel' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                     ],
-                    group: ['TOC', 'Status', 'AgentID', 'StatusQuo'],
+                    group: ['TOC', 'Status', 'AgentID', 'StatusQuote'],
                 })
                 .then((data) => {
                     if (data != null) {
@@ -59,6 +60,7 @@ module.exports = {
 
     },
     getMotorQuote: async (data, Role, callback) => {
+        Quote.belongsTo(Customer, { foreignKey: 'CustomerID' });
         if (Role == 'M') {
             await Quote.findAll(
                 {
@@ -66,6 +68,13 @@ module.exports = {
                         Status: data.Status,
                         TOC: data.TOC
                     },
+                    include: [
+                        {
+                            model: Customer,
+                            attributes: { exclude: ['QuotationID', 'CreateDate', 'UpdateDate'] }
+
+                        }
+                    ],
                     raw: true,
                     attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI']
 
@@ -85,9 +94,16 @@ module.exports = {
                 });
         }
         else {
-           await Quote.findAll(
+            await Quote.findAll(
                 {
                     where: data,
+                    include: [
+                        {
+                            model: Customer,
+                            attributes: { exclude: ['QuotationID', 'CreateDate', 'UpdateDate'] }
+
+                        }
+                    ],
                     raw: true,
                     attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI']
 

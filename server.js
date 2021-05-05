@@ -2,6 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const helmet = require('helmet');
+const cron = require('node-cron');
+const logger = require('morgan');
+
 // const http = require("http");
 
 // Models
@@ -9,7 +12,7 @@ const helmet = require('helmet');
 
 const app = express();
 
-let whiteList = ['http://localhost:8085'];
+let whiteList = ['http://localhost:4200'];
 let corsOptions = {
     origin: function (origin, callback) {
         if (whiteList.indexOf(origin) !== -1 || !origin) {
@@ -20,9 +23,11 @@ let corsOptions = {
     }
 };
 
+
 // var server = http.createServer(app);
 app.use(cors(corsOptions));
 app.use(helmet());
+app.use(logger('dev'));
 
 app.use(express.static(__dirname + '/uploads'));
 
@@ -54,12 +59,22 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to Test REST API." });
 });
 
+cron.schedule('* * * * * ', () => {
+    require("./app/services/cron.service")(app);
+  });
+
+cron.schedule('* * * * *', () => {
+    // console.log('Jalan')
+    require("./app/services/mail.service")(app);
+  });
+
 // User Routes
 require("./app/routes/user.routes")(app);
 require("./app/routes/mw.motor.routes")(app);
 require("./app/routes/quote.motor.routes")(app);
 require("./app/routes/dashboard.routes")(app);
 require("./app/routes/customer.routes")(app);
+require("./app/routes/backoffice/userbackoffice.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;

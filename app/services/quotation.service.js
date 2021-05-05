@@ -12,10 +12,24 @@ const MwClient = require('../mw/motor/mw.motor.client');
 const config = require("../config/mw.config");
 const configdb = require("../config/db.config");
 
-const convertdatedb  = (data) => {
-    var DateDB = new Date(data).toLocaleString();
-    var res = DateDB.slice(0, 9);
-    return res
+// const convertdatedb  = (data) => {
+//     var DateDB = new Date(data).toLocaleString();
+//     var res = DateDB.slice(0, 9);
+//     return res
+// }
+
+const formatDate = (date) => {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
 }
 
 const EIICareUser  = ( dataname, datano ) => {
@@ -46,6 +60,29 @@ module.exports = {
             }
         });
     },
+    updateQuotationforSentMail: async (id, data) => {
+        // console.log(id,data);
+        await Quote.update({
+            MailSent: data.MailSent,
+            MailFetchTries : data.MailFetchTries,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: id
+            }
+        });
+    },
+    updateQuotationforRetrieveFile: async (id, data) => {
+        // console.log(id,data);
+        await Quote.update({
+            EfilePath: data,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: id
+            }
+        });
+    },
     updateQuotationforSubmitPolicy: async (id, data) => {
         // console.log(id,data);
         await Quote.update({
@@ -55,6 +92,40 @@ module.exports = {
             where: {
                 QuotationID: id
             }
+        });
+    },
+    updateQuotation: async (id, data, callback) => {
+        await Quote.update({
+            Region: data.Region,
+            StartDate: data.StartDate,
+            EndDate : data.EndDate,
+            MainSI : data.MainSI,
+            Premium : data.Premium,
+            DiscPCT : data.DiscPCT,
+            DiscAmount : data.DiscAmount,
+            PolicyCost : data.PolicyCost,
+            StampDuty : data.StampDuty,
+            Status : data.Status,
+            UpdateDate : Date.now()
+
+        }, {
+            where: {
+                QuotationID: id
+            }
+        }).then((res) => {
+            // console.log(res)
+            if (res != null) {
+                try {
+                    data.EndDate = undefined;
+                    return callback(null, data);
+                }
+                catch (error) {
+                    return callback(error);
+                }
+            }
+            return callback(null, data);
+        }).catch((err) => {
+            return callback(err);
         });
     },
     ApproveQuoteByPK: async (data, callback) => {
@@ -93,7 +164,8 @@ module.exports = {
                         }
 
                         SaveUser.ID = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']) ;
-                        SaveUser.BirthDate = convertdatedb(data[0]['Customer.BirthDate']);
+                       
+                        SaveUser.BirthDate = formatDate(data[0]['Customer.BirthDate']);
                         SaveUser.Email = data[0]['Customer.Email'];
                         SaveUser.ID_Name = data[0]['Customer.CustomerName'];
                         SaveUser.ID_No = data[0]['Customer.IDNo'];
@@ -117,8 +189,8 @@ module.exports = {
                         SavePolicy.ValueDesc10 = data[0]['QuoDetailMV.Year'];
                         SavePolicy.ProductID = configdb.motorproductid;
                         SavePolicy.CoverageID = data[0].Topro;
-                        SavePolicy.InceptionDate = convertdatedb(data[0].StartDate);
-                        SavePolicy.ExpiryDate = convertdatedb(data[0].EndDate);
+                        SavePolicy.InceptionDate = formatDate(data[0].StartDate);
+                        SavePolicy.ExpiryDate = formatDate(data[0].EndDate);
                         SavePolicy.SI_1 = data[0].MainSI;
                         SavePolicy.CoverageCode1 = coverageDetails[0];
                         SavePolicy.CoverageCode2 = coverageDetails[1] == undefined ? null : coverageDetails[1];
@@ -327,7 +399,47 @@ module.exports = {
             }).catch((err) => {
             });
     },
+    updateQuoteDetail: async (data) => {
+        await QuoteDetailMV.update({
+            Brand: data.Brand,
+            Model: data.Model,
+            Type: data.Type,
+            Function: data.Function,
+            EngineNo: data.EngineNo,
+            LicenseNo : data.LicenseNo,
+            ChassisNo: data.ChassisNo,
+            Year: data.Year
+        }, {
+            where: {
+                QuotationID: data.QuotationID
+            }
+        });
+    },
     createCoverageDetail: async (data, id, SI, DiscPCT) => {
+        for (let i = 0; i < data.length; i++) {
+            const dataCoverage = {
+                QuotationID: id,
+                RateCode: data[i].coverage_code,
+                IsMain: data[i].is_main,
+                SumInsured: SI,
+                Rate: data[i].rate,
+                Premium: data[i].amount,
+                DiscPCT: DiscPCT,
+                AdminFee: data[i].admin_fee,
+                CoverageDetail: data[i].coverage_detail,
+            };
+            await Coverage.create(dataCoverage)
+                .then((res) => {
+                }).catch((err) => {
+                });
+        };
+    },
+    updateCoverageDetail: async (data, id, SI, DiscPCT) => {
+       await Coverage.destroy({
+            where: {
+                QuotationID: id
+            }
+        });
         for (let i = 0; i < data.length; i++) {
             const dataCoverage = {
                 QuotationID: id,
@@ -408,7 +520,6 @@ module.exports = {
                 return callback(error);
             });
     },
-
     updateFrontView: async (id, data) => {
         await QuoteDetailMV.update({
             FrontView: data
@@ -454,6 +565,4 @@ module.exports = {
             }
         })
     }
-
-
 }

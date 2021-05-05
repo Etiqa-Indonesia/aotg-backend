@@ -61,6 +61,11 @@ const quote_client = {
     const data = http.post(`${AOTG}/submit_policy`, payload)
     // return http.post(`${AOTG}/save_sys_user`, payload)
     return data
+  },
+  eFIle (payload) {
+    const data = http.post(`${AOTG}/efile`, payload)
+    // return http.post(`${AOTG}/save_sys_user`, payload)
+    return data
   }
   // testget (payload) {
   //   return http.post('http://192.168.112.100/WebAPI/MiddlewareAPI/SearchProduct', payload)
