@@ -14,6 +14,8 @@ const config = {
     local Axios timeout (in ms)
     */
     clientTimeout: 20000,
+
+    cacheDurationListingNew : '6 days',
     /*
     cache listing data so no need to call MW (in ms)
     */

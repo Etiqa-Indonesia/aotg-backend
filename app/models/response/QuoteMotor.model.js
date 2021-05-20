@@ -16,6 +16,7 @@ const motorout = {
     "status": null,
     "policyNo": null,
     "ANO": null,
+    "Remarks": null,
     "vehicle_detail": {},
     "customer_detail" : {
         "name": null,

@@ -61,45 +61,31 @@ module.exports = app => {
                             else {
                                 const EfileName = data[index].PolicyNo + '.pdf';
                                 const FilePath = path.join(DIRPOLICY + '/' + EfileName);
-                                console.log(FilePath);
                                 ResponseCarePolicy = resultRetrieveFile.data;
                                 const image = ResponseCarePolicy.Data;
                                 var bitmap = new Buffer.from(image, 'base64');
-                                fs.writeFile(FilePath, image, {encoding:'base64'}, (error) => {
+                                fs.writeFile(FilePath, image, { encoding: 'base64' }, (error) => {
                                     if (error) {
                                         SaveCareLog(error, '400',
                                             data[index].QuotationID, Policy, config.efilePolicyCareURL);
                                     }
                                     else {
-                                        console.log("Doc saved!");
-                                        updateQuotationforRetrieveFile(data[index].QuotationID, FilePath);
-                                        ResponseCarePolicy.Data = FilePath;
-                                        SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
-                                            data[index].QuotationID, Policy, config.efilePolicyCareURL);
+                                        if (ResponseCarePolicy.code != '200') {
+                                            SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
+                                                data[index].QuotationID, Policy, config.efilePolicyCareURL);
+                                        }
+                                        else {
+                                            console.log("Doc saved!");
+                                            updateQuotationforRetrieveFile(data[index].QuotationID, FilePath);
+                                            ResponseCarePolicy.Data = FilePath;
+                                            SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
+                                                data[index].QuotationID, Policy, config.efilePolicyCareURL);
+
+                                        }
+
                                     }
 
                                 });
-                                //fs.writeFile(FilePath, bitmap);
-                                // fs.writeFile(FilePath, bitmap, (error) => {
-                                //     if (error) {
-                                //         SaveCareLog(error, '400',
-                                //             data[index].QuotationID, Policy, config.efilePolicyCareURL);
-                                //     }
-                                //     else {
-                                //         console.log("Doc saved!");
-                                //         updateQuotationforRetrieveFile(data[index].QuotationID, FilePath);
-                                //         ResponseCarePolicy.Data = FilePath;
-                                //         SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
-                                //             data[index].QuotationID, Policy, config.efilePolicyCareURL);
-                                //     }
-
-                                // });
-                                // updateQuotationforRetrieveFile(data[index].QuotationID, FilePath);
-                                // ResponseCarePolicy.Data = FilePath;
-                                // SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
-                                // data[index].QuotationID, Policy, config.efilePolicyCareURL);
-
-
                             }
 
                         });

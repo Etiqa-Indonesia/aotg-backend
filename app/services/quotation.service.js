@@ -271,6 +271,7 @@ module.exports = {
                         motorout.status = data[0].Status
                         motorout.policyNo = data[0].PolicyNo
                         motorout.ANO = data[0].ANO
+                        motorout.Remarks = data[0].Remarks
 
                         var coverageDetails = [];
 
@@ -354,7 +355,8 @@ module.exports = {
                             FrontPath: data[0]['QuoDetailMV.FrontView'],
                             LeftPath: data[0]['QuoDetailMV.LeftView'],
                             RightPath: data[0]['QuoDetailMV.RightView'],
-                            BackPath: data[0]['QuoDetailMV.BackView']
+                            BackPath: data[0]['QuoDetailMV.BackView'],
+                            InsidePath: data[0]['QuoDetailMV.InsideView']
                         }
                         return callback(null, ImagePath);
                     }

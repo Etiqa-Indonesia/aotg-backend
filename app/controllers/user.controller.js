@@ -127,9 +127,9 @@ exports.getLogin =(req, res) => {
 
     getLoginUserJoin(condition,(err, results) => {
         if (err) {
-            return res.json({
+            return res.status(500).send({
                 success: 0,
-                message: "User atau Password salah"
+                message: err
             });
         }
         else{

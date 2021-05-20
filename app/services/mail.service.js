@@ -159,12 +159,6 @@ module.exports = app => {
                                 attachments: attachments
                             };
 
-                            try {
-
-                            } catch (error) {
-
-                            }
-
                             const MailInfo = 'Email sent to: ' + data[index]['Customer.Email'] + ' QuotationID : ' + QuotationID;
                             transporter.sendMail(mailOptions, function (error, info) {
                                 if (error) {

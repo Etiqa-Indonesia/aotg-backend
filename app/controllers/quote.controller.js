@@ -185,7 +185,8 @@ exports.CreateQuote = async (req, res) => {
         ANO: req.body.ANO,
         IsSubmittedCare: 0,
         MailSent: 0,
-        MailFetchTries: 0
+        MailFetchTries: 0,
+        Remarks : req.body.remarks
     };
 
 
@@ -601,6 +602,135 @@ exports.getImageRightView = async (req, res) => {
         else {
             var filepath = results.RightPath;
             res.sendFile(filepath);
+        }
+    });
+};
+exports.getImageInsideView = async (req, res) => {
+
+    const datasend = {
+        QuotationID: req.params.id
+    };
+
+    getImagebyPK(datasend, (err, results) => {
+        if (err) {
+            return res.json({
+                message: err
+            });
+        }
+        else {
+            var filepath = results.InsidePath;
+            res.sendFile(filepath);
+        }
+    });
+};
+
+exports.getImageInsideViewBase64 = async (req, res) => {
+
+    const datasend = {
+        QuotationID: req.params.id
+    };
+
+    getImagebyPK(datasend, (err, results) => {
+        if (err) {
+            return res.json({
+                message: err
+            });
+        }
+        else {
+            var imageAsBase64 = fs.readFileSync(results.InsidePath, 'base64');
+            res.status(200).json({
+                success: true,
+                message: 'Image as Base 64',
+                data: imageAsBase64
+            });
+        }
+    });
+};
+exports.getImageBackViewBase64 = async (req, res) => {
+
+    const datasend = {
+        QuotationID: req.params.id
+    };
+
+    getImagebyPK(datasend, (err, results) => {
+        if (err) {
+            return res.json({
+                message: err
+            });
+        }
+        else {
+            var imageAsBase64 = fs.readFileSync(results.BackPath, 'base64');
+            res.status(200).json({
+                success: true,
+                message: 'Image as Base 64',
+                data: imageAsBase64
+            });
+        }
+    });
+};
+exports.getImageFrontViewBase64 = async (req, res) => {
+
+    const datasend = {
+        QuotationID: req.params.id
+    };
+
+    getImagebyPK(datasend, (err, results) => {
+        if (err) {
+            return res.json({
+                message: err
+            });
+        }
+        else {
+            var imageAsBase64 = fs.readFileSync(results.FrontPath, 'base64');
+            res.status(200).json({
+                success: true,
+                message: 'Image as Base 64',
+                data: imageAsBase64
+            });
+        }
+    });
+};
+exports.getImageLeftViewBase64 = async (req, res) => {
+
+    const datasend = {
+        QuotationID: req.params.id
+    };
+
+    getImagebyPK(datasend, (err, results) => {
+        if (err) {
+            return res.json({
+                message: err
+            });
+        }
+        else {
+            var imageAsBase64 = fs.readFileSync(results.LeftPath, 'base64');
+            res.status(200).json({
+                success: true,
+                message: 'Image as Base 64',
+                data: imageAsBase64
+            });
+        }
+    });
+};
+exports.getImageRightViewBase64 = async (req, res) => {
+
+    const datasend = {
+        QuotationID: req.params.id
+    };
+
+    getImagebyPK(datasend, (err, results) => {
+        if (err) {
+            return res.json({
+                message: err
+            });
+        }
+        else {
+            var imageAsBase64 = fs.readFileSync(results.RightPath, 'base64');
+            res.status(200).json({
+                success: true,
+                message: 'Image as Base 64',
+                data: imageAsBase64
+            });
         }
     });
 };

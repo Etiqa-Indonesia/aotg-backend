@@ -38,6 +38,9 @@ db.QuotationLog = require("./quotation.log.model")(sequelize, Sequelize);
 db.QuotationMV = require("./quotation.mv.model")(sequelize, Sequelize);
 db.Coverage = require("./coverage.model")(sequelize, Sequelize);
 db.Response = require("./response.log.model")(sequelize, Sequelize);
-db.Customer = require("./customer.model")(sequelize, Sequelize);
+db.AgentCat = require("./agentcat.model")(sequelize, Sequelize);
+db.AgentTopro = require("./agenttopro.model")(sequelize, Sequelize);
+db.RateTab = require("./ratetab.model")(sequelize, Sequelize);
+db.RCAllowed = require("./rcallowed.model")(sequelize, Sequelize);
 
 module.exports = db;

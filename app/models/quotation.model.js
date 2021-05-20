@@ -100,6 +100,10 @@ module.exports = (sequelize, Sequelize) => {
         CarePolicyID: {
             allowNull: true,
             type: Sequelize.INTEGER
+        },
+        Remarks: {
+            allowNull: true,
+            type: Sequelize.STRING(250)
         }
 
     });

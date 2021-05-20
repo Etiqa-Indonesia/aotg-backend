@@ -12,7 +12,7 @@ const logger = require('morgan');
 
 const app = express();
 
-let whiteList = ['http://localhost:4200'];
+let whiteList = ['http://localhost:4200','http://192.168.112.113'];
 let corsOptions = {
     origin: function (origin, callback) {
         if (whiteList.indexOf(origin) !== -1 || !origin) {
@@ -75,6 +75,7 @@ require("./app/routes/quote.motor.routes")(app);
 require("./app/routes/dashboard.routes")(app);
 require("./app/routes/customer.routes")(app);
 require("./app/routes/backoffice/userbackoffice.routes")(app);
+require("./app/routes/backoffice/motorbackoffice.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;

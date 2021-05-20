@@ -15,10 +15,11 @@ module.exports = app => {
     router.put("/quotes/:id/uploadrightview",checktoken, quote.uploadRightView);
     router.put("/quotes/:id/uploadinsideview",checktoken, quote.uploadInsideView);
     router.get("/quote/:id",checktoken, quote.getQuotebyPK);
-    router.get("/quote/backimage/:id",checktoken, quote.getImageBackView);
-    router.get("/quote/frontimage/:id",checktoken, quote.getImageFrontView);
-    router.get("/quote/leftimage/:id",checktoken, quote.getImageLeftView);
-    router.get("/quote/rightimage/:id",checktoken, quote.getImageRightView);
+    router.get("/quote/backimage/:id",checktoken, quote.getImageBackViewBase64);
+    router.get("/quote/frontimage/:id",checktoken, quote.getImageFrontViewBase64);
+    router.get("/quote/leftimage/:id",checktoken, quote.getImageLeftViewBase64);
+    router.get("/quote/rightimage/:id",checktoken, quote.getImageRightViewBase64);
+    router.get("/quote/insideimage/:id",checktoken, quote.getImageInsideViewBase64);
 
     //Prefix
     app.use("/motor", router);
