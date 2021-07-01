@@ -9,6 +9,18 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: true,
             type: Sequelize.INTEGER
         },
+        UserID: {
+            allowNull: true,
+            type: Sequelize.STRING
+        },
+        Status: {
+            allowNull: true,
+            type: Sequelize.STRING
+        },
+        Remarks: {
+            allowNull: true,
+            type: Sequelize.STRING
+        },
         CreateDate: {
             allowNull: true,
             type: Sequelize.DATE,

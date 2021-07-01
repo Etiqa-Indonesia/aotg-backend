@@ -5,9 +5,10 @@ const Quote = db.Quotation;
 const UserLog = db.UserLog;
 const Customer = db.Customer;
 const Op = db.Sequelize.Op;
+const config = require("../../config/db.config")
 
 
-var IDType = {"KTP": "1", "Passport": "2"}
+var IDType = { "KTP": "1", "Passport": "2" }
 
 module.exports = {
     createUser: async (data, callback) => {
@@ -19,18 +20,68 @@ module.exports = {
                 return callback(err);
             });
     },
+    findUser: async (data) => {
+        return await User.findOne(
+            {
+                where: { UserID: data }
+            }
+        )
+    },
+    findAgentNotInUser: async (data) => {
+        return await Agent.findAll({
+            where: {
+                AgentID: { [Op.notIn]: data }
+            },
+            attributes: ['AgentID', 'Name']
+        });
+    },
+    findUserName: async (data) => {
+        return await User.findOne(
+            {
+                where: { UserName: data }
+            }
+        )
+    },
+    findUserMail: async (data) => {
+        return await User.findOne(
+            {
+                where: { EmailAddress: data }
+            }
+        )
+    },
+    findUserMailUpdate: async (data) => {
+        return await User.findOne(
+            {
+                where: {
+                    EmailAddress: data.EmailAddress,
+                    UserID : data.UserID
+
+                }
+            }
+        )
+    },
+    findListAgentOnUser: async (data) => {
+        return await User.findAll({
+            where: {
+                AgentID: {
+                    [Op.ne]: null
+                }
+            },
+            attributes: ["AgentID"]
+        });
+    },
     updateUser: async (data, callback) => {
         await User.update({
-            UserName: data.UserName,
-            Role: data.Role,
             isActive: data.isActive,
             ExpiryDate: data.ExpiryDate,
             TerminateDate: data.TerminateDate,
+            EmailAddress: data.EmailAddress,
+            isLockOut: data.isLockOut,
             UpdateDate: Date.now()
 
         }, {
             where: {
-                AgentID: data.AgentID
+                UserID: data.UserID
             }
         }).then((res) => {
             if (res != null) {
@@ -51,7 +102,7 @@ module.exports = {
             Name: data.Name,
             ProfileID: data.ProfileID,
             Branch: data.Branch,
-            IDType: IDType[data.Type],
+            IDType: data.IDType,
             IDNo: data.IDNo,
             PhoneNo: data.PhoneNo,
             Email: data.Email,
@@ -96,10 +147,24 @@ module.exports = {
         return await Agent.findAll({
         })
     },
-    findDetailAgent : async(data) =>{
+    findDetailAgent: async (data) => {
         return await Agent.findOne(
             {
-                where: { AgentID: data}
+                where: { AgentID: data }
+            }
+        )
+    },
+    findDetailAgentOnUser: async (data) => {
+        return await User.findOne(
+            {
+                where: { AgentID: data }
+            }
+        )
+    },
+    findProfileIDAgent: async (data) => {
+        return await Agent.findOne(
+            {
+                where: { ProfileID: data }
             }
         )
     },
@@ -141,11 +206,16 @@ module.exports = {
             // order: db.Sequelize.literal('CustomerName')
         })
     },
+    findAllUser: async () => {
+        return await User.findAll({
+            attributes: { exclude: ['Password', 'CreateDate', 'UpdateDate'] },
+        })
+    },
     findDetailCustomer: async (data) => {
         Customer.belongsTo(Agent, { foreignKey: 'AgentID' });
         return await Customer.findAll(
             {
-                where: { CustomerID: data},
+                where: { CustomerID: data },
                 attributes: { exclude: ['CreateDate', 'UpdateDate'] },
                 include: [
                     { model: Agent, attributes: { exclude: ['TerminatedDate', 'JoinedDate'] } },
@@ -153,5 +223,27 @@ module.exports = {
                 // order: db.Sequelize.literal('CustomerName')
             }
         )
+    },
+    findDetailUser: async (data) => {
+        User.belongsTo(Agent, { foreignKey: 'AgentID' });
+        return await User.findAll(
+            {
+                where: { UserID: data },
+                attributes: { exclude: ['Password'] },
+                include: [
+                    { model: Agent, attributes: { exclude: ['TerminatedDate', 'JoinedDate'] } },
+                ],
+                // order: db.Sequelize.literal('CustomerName')
+            }
+        )
+    },
+    randomUserID: async () => {
+        var chars = config.charRandom;
+        var length = config.lengthRandomUserID;
+
+        var result = '';
+        for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+        return result;
+
     }
 }

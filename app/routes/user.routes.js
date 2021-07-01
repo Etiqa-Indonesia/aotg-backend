@@ -8,6 +8,8 @@ module.exports = app => {
     // Routes
     router.post("/createuser",checktoken, user.createUser);
     router.post("/createagent",checktoken, user.createAgent);
+    router.post("/resetpassword", user.forgotPassword);
+    router.post("/updatepassword",checktoken, user.updatePassword);
 
     router.get("/:id",checktoken, user.findUser);
 

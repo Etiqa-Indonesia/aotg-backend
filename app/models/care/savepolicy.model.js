@@ -4,8 +4,8 @@ const SavePolicy = {
     FLDID3: null,
     FLDID4: 'V06',
     FLDID5: 'V04',
-    FLDID6: null,
-    FLDID7: null,
+    FLDID6: 'V05',
+    FLDID7: 'V13',
     FLDID8: null,
     FLDID9: null,
     FLDID10: 'V16',
@@ -71,7 +71,8 @@ const SavePolicy = {
     PolicyDetail: [],
     Beneficiaries: [],
     InterestedParty: [],
-    DiscPCT: 0
+    DiscPCT: 0,
+    StampDuty : 0
   }
 
   module.exports = SavePolicy

@@ -10,7 +10,8 @@ exports.getMotorDashboard = async (req, res) => {
     getMotorDashboard(data, Role, (err, results)=>{
         if (err) {
             return res.status(500).send({
-                message: "Error Retrieving Data"
+                message: "Error Retrieving Data",
+                error: err
 
             });
         } else {

@@ -3,6 +3,7 @@ const AgentCat = db.AgentCat;
 const AgentTopro = db.AgentTopro;
 const RateTab = db.RateTab;
 const RCAllowed = db.RCAllowed;
+const RateCode = db.RateTab
 
 
 module.exports = { 
@@ -31,5 +32,12 @@ module.exports = {
 
             }
         )
-    }
+    },
+    findAllRateCode : async(data) =>{
+        return await RateCode.findAll(
+            {
+                raw :true
+            }
+        )
+    },
 }

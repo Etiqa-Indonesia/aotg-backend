@@ -1,5 +1,6 @@
 module.exports = app => {
     const quote = require("../controllers/quote.controller");
+    const vehicletype = require("../controllers/vehicletype.controller");
     const { checktoken } = require("../auth/token_validation")
     
 
@@ -20,6 +21,10 @@ module.exports = app => {
     router.get("/quote/leftimage/:id",checktoken, quote.getImageLeftViewBase64);
     router.get("/quote/rightimage/:id",checktoken, quote.getImageRightViewBase64);
     router.get("/quote/insideimage/:id",checktoken, quote.getImageInsideViewBase64);
+
+    router.get("/platecodeinfo/:pcode",checktoken, quote.findPlateCode);
+
+    router.get("/vehicletypeallowed/agentype/:agentcatid/vehicletype/:vehicletype/:id",checktoken, vehicletype.findAllVehicleTypeAllowed);
 
     //Prefix
     app.use("/motor", router);

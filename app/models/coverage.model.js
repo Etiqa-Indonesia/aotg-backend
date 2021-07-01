@@ -18,7 +18,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         SumInsured: {
             allowNull: true,
-            type: Sequelize.FLOAT()
+            type: Sequelize.STRING(100)
         },
         Rate: {
             allowNull: true,

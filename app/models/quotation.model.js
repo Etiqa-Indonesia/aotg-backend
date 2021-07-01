@@ -15,7 +15,8 @@ module.exports = (sequelize, Sequelize) => {
         },
         CreateDate: {
             allowNull: true,
-            type: Sequelize.DATE
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW
         },
         UpdateDate: {
             allowNull: true,
@@ -42,6 +43,22 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.DATE
         },
         MainSI: {
+            allowNull: true,
+            type: Sequelize.FLOAT()
+        },
+        SI_2: {
+            allowNull: true,
+            type: Sequelize.FLOAT()
+        },
+        SI_3: {
+            allowNull: true,
+            type: Sequelize.FLOAT()
+        },
+        SI_4: {
+            allowNull: true,
+            type: Sequelize.FLOAT()
+        },
+        SI_5: {
             allowNull: true,
             type: Sequelize.FLOAT()
         },

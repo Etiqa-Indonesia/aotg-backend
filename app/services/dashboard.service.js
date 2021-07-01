@@ -10,12 +10,12 @@ module.exports = {
             await Quote.findAll(
                 {
                     raw: true,
-                    attributes: [
+                    attributes: [ 'Status',
                         [db.sequelize.fn('COUNT', db.sequelize.col('Status')), 'count'],
                         [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
-                        WHEN Status = '2' THEN 'Quote Cancel' ELSE 'Quote Disetujui' END`), 'StatusQuote']
+                        WHEN Status = '2' THEN 'Quote Reject' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                     ],
-                    group: ['TOC', 'Status', 'AgentID', 'StatusQuote'],
+                    group: ['TOC', 'Status', 'StatusQuote'],
                 })
                 .then((data) => {
                     if (data != null) {
@@ -36,10 +36,10 @@ module.exports = {
                 {
                     where: data,
                     raw: true,
-                    attributes: [
+                    attributes: ['Status',
                         [db.sequelize.fn('COUNT', db.sequelize.col('Status')), 'count'],
                         [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
-                        WHEN Status = '2' THEN 'Quote Cancel' ELSE 'Quote Disetujui' END`), 'StatusQuote']
+                        WHEN Status = '2' THEN 'Quote Reject' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                     ],
                     group: ['TOC', 'Status', 'AgentID', 'StatusQuote'],
                 })
@@ -76,7 +76,11 @@ module.exports = {
                         }
                     ],
                     raw: true,
-                    attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI']
+                    attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI'],
+                    order: [
+                        ['QuotationID', 'DESC']
+                      ]
+                    
 
                 })
                 .then((data) => {
@@ -105,7 +109,10 @@ module.exports = {
                         }
                     ],
                     raw: true,
-                    attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI']
+                    attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI'],
+                    order: [
+                        ['QuotationID', 'DESC']
+                      ]
 
                 })
                 .then((data) => {

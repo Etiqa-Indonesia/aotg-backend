@@ -24,7 +24,7 @@ module.exports = {
                 attributes: ['Status',
                     [db.sequelize.fn('COUNT', db.sequelize.col('Status')), 'count'],
                     [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
-                        WHEN Status = '2' THEN 'Quote Cancel' ELSE 'Quote Disetujui' END`), 'StatusQuote']
+                        WHEN Status = '2' THEN 'Quote Reject' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                 ],
                 group: ['TOC', 'Status', 'StatusQuote'],
             })
@@ -59,7 +59,10 @@ module.exports = {
                     }
                 ],
                 // raw: true,
-                attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI']
+                attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI'],
+                order: [
+                    ['QuotationID', 'DESC']
+                  ]
 
             })
             .then((data) => {
@@ -68,11 +71,13 @@ module.exports = {
                         return callback(null, data);
                     }
                     catch (error) {
+                        console.log(error)
                         return callback(error);
                     }
                 }
                 return callback(err, data);
             }).catch((error) => {
+                console.log(error)
                 return callback(error);
             });
     }

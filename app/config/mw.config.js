@@ -6,16 +6,16 @@ const config = {
     /*
     address of MW Rest API
     */
-    //baseUrl: process.env.NODE_ENV === 'production' ? 'http://MWHOST' : 'http://MWHOST',
+    baseUrl: process.env.NODE_ENV === 'production' ? 'http://MWHOST' : 'http://MWHOST',
     //baseUrl: 'http://192.168.112.88:8353',
     //baseUrl: 'http://MWHOST:8353',
-    baseUrl: 'http://localhost:8353',
+    //baseUrl: 'http://localhost:8353',
     /*
     local Axios timeout (in ms)
     */
     clientTimeout: 20000,
 
-    cacheDurationListingNew : '6 days',
+    cacheDurationListingNew : '20 days',
     /*
     cache listing data so no need to call MW (in ms)
     */

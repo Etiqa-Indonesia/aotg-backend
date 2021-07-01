@@ -44,6 +44,10 @@ module.exports = (sequelize, Sequelize) => {
         isLockOut: {
             allowNull: true,
             type: Sequelize.INTEGER
+        },
+        EmailAddress: {
+            allowNull: true,
+            type: Sequelize.STRING
         }
 
     });

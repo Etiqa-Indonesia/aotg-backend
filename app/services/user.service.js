@@ -76,7 +76,7 @@ module.exports = {
                     model: Agent,
                     attributes: ['AgentID', 'Name', 'Type', 'Branch'
                         , 'IDNo', 'PhoneNo', 'Email', 'Company'
-                        , 'NPWP', 'Bank', 'Address', 'City'],
+                        , 'NPWP', 'Bank', 'Address', 'City','AccountNo'],
                     include: [{
                         model: AgentCat,
                         attributes: { exclude: ['AgentLevel'] }
@@ -97,10 +97,30 @@ module.exports = {
                         return callback(error);
                     }
                 }
-                return callback(err, data[0]);
+                else {
+                    return callback('User atau Password salah', data[0]);
+                }
+                
             }).catch((error) => {
                 console.log(error)
                 return callback(error);
             });
-    }
+    },
+    forgotPassword : async (data, callback) =>{
+        return await User.findOne({
+            where: { EmailAddress: data,
+                    isActive : 1},
+        })
+    },
+    updateUser: async (data, callback) => {
+        await User.update({
+            Password: data.Password,
+            UpdateDate: Date.now()
+
+        }, {
+            where: {
+                EmailAddress: data.EmailAddress
+            }
+        })
+    },
 };

@@ -6,6 +6,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         RateDesc: {
             type: Sequelize.STRING(100)
+        },
+        Main: {
+            type: Sequelize.INTEGER
         }
 
     });

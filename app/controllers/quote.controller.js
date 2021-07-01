@@ -1,15 +1,18 @@
 const db = require("../models");
 const Quote = db.Quotation;
 const Op = db.Sequelize.Op;
-const { createCoverageDetail, createQuote,
-    createQuoteLog, createQuoteDetail,
+const { createCoverageDetail, createQuote, createQuoteLogBackOffice,
+    createQuoteLog, createQuoteDetail, checkExistCustomer, createCustomer, updateCustomer,
     updateFrontView, updateBackView, updateLeftView, updateRightView,
     createorupdateCustomer, updateCustomerQuotation,
     getQuotebyPK, getImagebyPK, ApproveQuoteByPK, updateInsideView,
-    updateQuotationforPolicy, updateQuotationforSubmitPolicy,
-    updateQuotation, updateQuoteDetail, updateCoverageDetail } = require("../services/quotation.service");
+    updateQuotationforPolicy, updateQuotationforSubmitPolicy, updateQuotationforQuoteBackOffice,
+    updateQuotation, updateQuoteDetail, updateCoverageDetail, rejectQuotationforBackOffice } = require("../services/quotation.service");
 const { createResponseLog } = require("../services/responselog.service");
 const { SaveUser, SavePolicy, SubmitPolicy } = require("../services/care.service");
+const { SendMail } = require("../services/backoffice/mail.quotation.service");
+const { findMarketingEmailByAgentID } = require('../services/agenthandler.service');
+const { findPlateCode } = require('../services/platecode.service');
 const multer = require('multer');
 const path = require("path");
 const fs = require('fs');
@@ -23,7 +26,9 @@ const DIRBACK = path.join(__dirname, '../../uploads/backview');
 const DIRLEFT = path.join(__dirname, '../../uploads/leftview');
 const DIRRIGHT = path.join(__dirname, '../../uploads/rightview');
 const DIRINSIDE = path.join(__dirname, '../../uploads/insideview');
+const DirHTMLMailCreateQuote = path.join(__dirname, '../mail/createquotation.html');
 const config = require('../config/db.config');
+// const sendmail = require("../services/test.service");
 
 
 
@@ -68,18 +73,60 @@ exports.getQuotebyPK = async (req, res) => {
     });
 };
 
+exports.findPlateCode = async (req, res) => {
+    const datasend = req.params.pcode
+    try {
+        const PCodeList = await findPlateCode(datasend);
+
+        res.status(200).send({
+            'code': '200',
+            'message': 'Success',
+            'data': PCodeList
+        })
+    } catch (error) {
+        res.status(400).send({
+            'code': '400',
+            'message': 'Error',
+            'data': error
+        })
+    }
+
+    findPlateCode(datasend, (err, results) => {
+        if (err) {
+            return res.json({
+                message: err
+            });
+        }
+        else {
+            res.status(200).send({
+                results
+            });
+        }
+    });
+};
+
 exports.ApproveQuote = async (req, res) => {
     const datasend = {
         QuotationID: req.params.id
     };
+    const dataQuolog = {
+        QuotationID: req.params.id,
+        Remarks: req.body.Remarks,
+        Status: req.body.Status,
+        UserID: req.body.UserID
+    };
+    // console.log(dataQuolog);
     var urlobj = url.parse(req.originalUrl);
     urlobj.protocol = req.protocol;
     urlobj.host = req.get('host');
     var requrl = url.format(urlobj);
 
     ApproveQuoteByPK(datasend, (err, results) => {
+        createQuoteLogBackOffice(dataQuolog);
+        updateQuotationforQuoteBackOffice(dataQuolog);
         if (err) {
-            return res.json({
+            res.status(400).send({
+                status: 400,
                 message: err
             });
         }
@@ -101,7 +148,7 @@ exports.ApproveQuote = async (req, res) => {
                         if (err) {
                             const Response = "Error Cek Param yang dikirim & Save Policy gagal dilakukan";
                             const Status = 422;
-                            SaveCareLog(Response, Status, req.params.id, results.PolicyData, config.saveUserCareURl);
+                            SaveCareLog(Response, Status, req.params.id, results.PolicyData, config.savePolicyCareURL);
                         }
                         else {
                             ResponseCarePolicy = resultPolicy.data;
@@ -149,7 +196,20 @@ exports.ApproveQuote = async (req, res) => {
 };
 
 exports.RejectQuote = async (req, res) => {
+    var dataSend = {
+        QuotationID: req.params.id,
+        Remarks: req.body.Remarks,
+        UserID: req.body.UserID,
+        Status: config.statusReject
+    }
 
+    rejectQuotationforBackOffice(dataSend);
+    createQuoteLogBackOffice(dataSend);
+
+    res.status(200).json({
+        status: 200,
+        message: 'Berhasil Reject Quotation ID :' + req.params.id
+    });
 
 };
 
@@ -175,6 +235,10 @@ exports.CreateQuote = async (req, res) => {
         StartDate: req.body.inception_date,
         EndDate: EndDate,
         MainSI: req.body.sum_insured_1,
+        SI_2: req.body.sum_insured_2,
+        SI_3: req.body.sum_insured_3,
+        SI_4: req.body.sum_insured_4,
+        SI_5: req.body.sum_insured_5,
         Premium: req.body.total_premium, //Total Premium
         DiscPCT: req.body.discount_pct,
         DiscAmount: req.body.total_discount, //Total discount
@@ -186,7 +250,7 @@ exports.CreateQuote = async (req, res) => {
         IsSubmittedCare: 0,
         MailSent: 0,
         MailFetchTries: 0,
-        Remarks : req.body.remarks
+        Remarks: req.body.remarks
     };
 
 
@@ -211,6 +275,18 @@ exports.CreateQuote = async (req, res) => {
     DataLog.Param = JSON.stringify(req.body);
     DataLog.StatusCode = 200;
     DataLog.Response = null
+    var dataMarketing = await findMarketingEmailByAgentID(req.body.agentid)
+    const listMail = []
+    for (let i = 0; i < dataMarketing.length; i++) {
+        const MailMarketing = dataMarketing[i]['ListUser.EmailAddress']
+        listMail.push(MailMarketing);
+    }
+    const DataSendMail = {
+        Name: req.body.agent_name,
+        Pathfile: DirHTMLMailCreateQuote,
+        Email: listMail,
+        QuotationID: null
+    }
 
     const dataCustomer = {
         // CustomerID : null,
@@ -227,24 +303,51 @@ exports.CreateQuote = async (req, res) => {
         ZipCode: Customer.zipcode,
         AgentID: req.body.agentid
     };
-
-    if (Customer.name == undefined || dataCustomer.IDNo == null
-        || dataCustomer.IDType == null || dataCustomer.CustomerName == null) {
-        res.status(201).json({
+    if (Customer.name == undefined || dataCustomer.CustomerName == null) {
+        return res.status(400).json({
             success: false,
-            suspect: {
-                Customer: 'Data Customer Kosong atau',
-                IDNo: 'ID Number Kosong atau ',
-                IDType: 'ID Type Kosong atau',
-                CustomerName: 'Nama Customer Kosong'
-
-            },
-            message: 'Cek kembali lemparan Anda'
+            message: 'Nama Customer tidak boleh Kosong'
         });
     }
+    if (dataCustomer.IDNo == null) {
+        return res.status(400).json({
+            success: false,
+            message: 'ID Nomor Customer tidak boleh kosong'
+        });
+    }
+    if (dataCustomer.IDType == null) {
+        return res.status(400).json({
+            success: false,
+            message: 'ID Type Customer tidak boleh kosong'
+        });
+    }
+    if (dataCustomer.BirthDate == null|| dataCustomer.BirthDate == '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Tanggal lahir Customer tidak boleh kosong'
+        });
+    }
+
+
+
+    // if (Customer.name == undefined || dataCustomer.IDNo == null
+    //     || dataCustomer.IDType == null || dataCustomer.CustomerName == null || dataCustomer.BirthDate == null|| dataCustomer.BirthDate == '') {
+    //     res.status(400).json({
+    //         success: false,
+    //         suspect: {
+    //             Customer: 'Data Customer Kosong atau',
+    //             IDNo: 'ID Number Kosong atau ',
+    //             IDType: 'ID Type Kosong atau',
+    //             CustomerName: 'Nama Customer Kosong',
+    //             BirthDate: 'Tanggal Lahir Kosong'
+
+    //         },
+    //         message: 'Cek kembali lemparan Anda'
+    //     });
+    // }
     if (VehicleDetails.brand == undefined) {
 
-        res.status(201).json({
+        return res.status(201).json({
             success: false,
             message: 'Data Kendaraan Kosong'
         });
@@ -277,14 +380,20 @@ exports.CreateQuote = async (req, res) => {
 
                     createResponseLog(DataLog);
                     updateQuoteDetail(dataVehicle);
-                    createQuoteLog(dataVehicle);
+                    const dataQuolog = {
+                        QuotationID: QuotationID,
+                        Remarks: "Resubmit Quote",
+                        Status: config.statusNew,
+                        UserID: req.body.userid
+                    };
 
+                    createQuoteLogBackOffice(dataQuolog);
                     updateCoverageDetail(PremiumDetails, QuotationID,
                         req.body.sum_insured_1, req.body.discount_pct);
 
 
                     res.status(200).send({
-                        data : req.body
+                        data: req.body
                     });
                 }
 
@@ -299,6 +408,19 @@ exports.CreateQuote = async (req, res) => {
                 }
                 else {
                     try {
+                        // const CustomerExist = await checkExistCustomer(dataCustomer)
+                        // if (!CustomerExist) {
+                        //     console.log('Masuk Customer Insert')
+                        //     const resultCustomer = await createCustomer(dataCustomer)
+                        //     console.log(resultCustomer)
+                        //     updateCustomerQuotation(results.QuotationID, resultCustomer.CustomerID);
+                        // }
+                        // else {
+                        //     console.log(CustomerExist.CustomerID)
+                        //     console.log('Masuk Customer Update')
+                        //     await updateCustomer(CustomerExist.CustomerID)
+                        //     updateCustomerQuotation(results.QuotationID, resultCustomer.CustomerID);
+                        // }
                         createorupdateCustomer(dataCustomer, (err, resultsC) => {
                             // console.log(results);
                             updateCustomerQuotation(results.QuotationID, resultsC);
@@ -308,16 +430,27 @@ exports.CreateQuote = async (req, res) => {
 
                         });
                         dataVehicle.QuotationID = results.QuotationID;
+                        DataSendMail.QuotationID = results.QuotationID;
                         DataLog.QuotationID = results.QuotationID;
                         DataLog.Response = JSON.stringify(results);
                         createResponseLog(DataLog);
                         createQuoteDetail(dataVehicle);
-                        createQuoteLog(results);
+                        //createQuoteLog(results);
+
+                        const dataQuolog = {
+                            QuotationID: results.QuotationID,
+                            Remarks: "Create Quote",
+                            Status: config.statusNew,
+                            UserID: req.body.userid
+                        };
+
+                        createQuoteLogBackOffice(dataQuolog);
+
+                        SendMail(DataSendMail);
 
                         createCoverageDetail(PremiumDetails, results.QuotationID,
                             req.body.sum_insured_1, req.body.discount_pct);
 
-                        // results.CustomerID = customerresult;
                         await res.status(200).send({
                             results
                         });
