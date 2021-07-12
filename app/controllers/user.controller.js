@@ -306,9 +306,10 @@ exports.getLogin = (req, res) => {
                     // const result = null;
                     results.Password = undefined;
                     const toToken = results.AgentID + results.UserID;
+                    const expiresIn = 30
 
                     const jsontoken = sign({ toToken }, dbkey.key, {
-                        expiresIn: "2h"
+                        expiresIn: `${expiresIn}m`
                     });
                     return res.json({
                         success: true,
@@ -322,4 +323,14 @@ exports.getLogin = (req, res) => {
 
 
     });
+};
+
+exports.logout = (req, res) => {
+    console.log('masuk');
+    
+    return res.status(200).send({
+        success: 200,
+        message: "Sukses Logout",
+        
+    })
 };

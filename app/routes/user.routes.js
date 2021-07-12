@@ -14,6 +14,7 @@ module.exports = app => {
     router.get("/:id",checktoken, user.findUser);
 
     router.post("/login",  user.getLogin);
+    router.post("/logout",  user.logout);
     // router.post("/test",  testSendMail);
 
     //Prefix
