@@ -230,7 +230,8 @@ exports.updateUser = async (req, res) => {
         isActive :req.body.isActive,
         ExpiryDate : req.body.ExpiryDate,
         TerminateDate : req.body.TerminateDate,
-        isLockOut : req.body.isLockOut
+        isLockOut : req.body.isLockOut,
+        LoginAttempt : 0
     }
 
    const dataCheckMail= {

@@ -48,6 +48,14 @@ module.exports = (sequelize, Sequelize) => {
         EmailAddress: {
             allowNull: true,
             type: Sequelize.STRING
+        },
+        SessionID: {
+            allowNull: true,
+            type: Sequelize.STRING
+        },
+        LoginAttempt: {
+            allowNull: true,
+            type: Sequelize.INTEGER
         }
 
     });

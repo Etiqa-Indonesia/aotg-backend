@@ -1,8 +1,15 @@
 const dbConfig = require("../config/db.config.js");
+const {decrypt} = require('../auth/encrypt')
 
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-    host: dbConfig.HOST,
+
+var USER = decrypt(dbConfig.USER)
+const Password = decrypt(dbConfig.PASSWORD)
+const DBName = decrypt(dbConfig.DB)
+const HOST = decrypt(dbConfig.HOST)
+
+const sequelize = new Sequelize(DBName, USER, Password, {
+    host: HOST,
     dialect: dbConfig.dialect,
     operatorAliases: false,
     define:{

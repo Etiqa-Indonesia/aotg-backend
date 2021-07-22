@@ -77,6 +77,7 @@ module.exports = {
             TerminateDate: data.TerminateDate,
             EmailAddress: data.EmailAddress,
             isLockOut: data.isLockOut,
+            LoginAttempt : data.LoginAttempt,
             UpdateDate: Date.now()
 
         }, {

@@ -47,6 +47,39 @@ const PasswordPolicy = (text) => {
     return isAllowed
 }
 
+// ERROR HANDLING
+// maybe can put in shared folder
+exports.badRequest = async (req, res, error) => {
+    res.status(400).send({
+        'code': '400',
+        'message': 'Bad Request',
+        'error': error
+    })
+}
+
+exports.unauthorized = async (req, res, error) => {
+    res.status(401).send({
+        'code': '401',
+        'message': 'Unauthorized',
+        'error': error
+    })
+}
+
+exports.internalServerError = async (req, res, error) => {
+    res.status(500).send({
+        'code': '500',
+        'message': 'Internal Server Error',
+        'error': error
+    })
+}
+
+exports.success = async (req, res, data) => {
+    res.status(200).send({
+        'code': '200',
+        'message': 'Success',
+        'data': data
+    })
+}
 
 
 

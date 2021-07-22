@@ -41,25 +41,29 @@ module.exports = {
 
     },
 
-    getLoginUser: (data, callback) => {
-        User.findAll(
-            {
-                where: data,
-                raw: true
-            })
-            .then((data) => {
-                if (data[0] != null) {
-                    try {
-                        return callback(null, data[0]);
-                    }
-                    catch (error) {
-                        return callback(error);
-                    }
+    getLoginUser: async (data) => {
+        Agent.hasMany(User, { foreignKey: 'AgentID' });
+        User.belongsTo(Agent, { foreignKey: 'AgentID' });
+        Agent.belongsTo(AgentCat, { foreignKey: 'Type', targetKey: 'AgentCatID' });
+        Agent.hasOne(AgentCat, { foreignKey: 'AgentCatID', sourceKey: 'Type' })
+
+        return await User.findOne({
+            where: data,
+                attributes: { exclude: ['CreateDate', 'UpdateDate','LoginAttempt','SessionID'] },
+                include: [{
+                    model: Agent,
+                    attributes: ['AgentID', 'Name', 'Type', 'Branch'
+                        , 'IDNo', 'PhoneNo', 'Email', 'Company'
+                        , 'NPWP', 'Bank', 'Address', 'City','AccountNo'],
+                    include: [{
+                        model: AgentCat,
+                        attributes: { exclude: ['AgentLevel'] }
+
+                    }]
+
                 }
-                return callback(err, data[0]);
-            }).catch((error) => {
-                return callback(error);
-            });
+                ]
+        })
     },
 
     getLoginUserJoin: async (data, callback) => {
@@ -112,6 +116,40 @@ module.exports = {
                     isActive : 1},
         })
     },
+    updateToken : async (username, token) => {
+         await User.update({
+            SessionID: token,
+            UpdateDate: Date.now()
+        }, {
+            where: { UserName: username }
+        })
+    },
+    getUserToken : async (username) => {
+        return await User.findOne({
+            attributes: ['SessionID', 'UserID'],
+            where: { UserName: username },
+        })
+    },
+    getLoginAttempt : async (username) => {
+         return await User.findOne({
+            attributes: ['LoginAttempt', 'UserID'],
+            where: { UserName: username },
+        })
+    },
+    updateAttempt : async (username, attempt) => {
+        await User.update({
+           LoginAttempt: attempt,
+           UpdateDate: Date.now()
+       }, {
+           where: { UserName: username }
+       })
+   },
+    logoutUser : async (token) => {
+         await User.update(
+            { SessionID: null },
+            { where: { SessionID: token } }
+        )
+    },
     updateUser: async (data, callback) => {
         await User.update({
             Password: data.Password,
@@ -123,4 +161,27 @@ module.exports = {
             }
         })
     },
+    updateLoginAttempt: async (username, attempt) => {
+        await User.update({
+            LoginAttempt: attempt,
+            UpdateDate: Date.now()
+
+        }, {
+            where: {
+                UserName: username
+            }
+        })
+    },
+    nonActiveUser: async (username) => {
+        console.log('masuk sini')
+        await User.update({
+            isLockOut: 1,
+            UpdateDate: Date.now()
+
+        }, {
+            where: {
+                UserName: username
+            }
+        })
+    }
 };

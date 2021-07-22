@@ -1,10 +1,12 @@
 const db = require("../models");
+const { success, badRequest, internalServerError, unauthorized } = require('../services/global.service')
 const User = db.User;
 const Op = db.Sequelize.Op;
 const { genSaltSync, hashSync, compare } = require("bcrypt");
-const { getLoginUser, createUser, forgotPassword, updateUser,
-    getUserByPK, getLoginUserJoin, createAgent } = require("../services/user.service")
-const { sign } = require("jsonwebtoken");
+const { getUserLastLogin, updateUserLogout } = require('../services/userlog.service')
+const { getLoginUser, createUser, forgotPassword, updateUser, updateToken, getUserToken, logoutUser,
+    getUserByPK, getLoginUserJoin, createAgent, getLoginAttempt, updateAttempt, updateLoginAttempt, nonActiveUser } = require("../services/user.service")
+const { sign, verify } = require("jsonwebtoken");
 const { SaveCareLog, PasswordPolicy } = require('../services/global.service')
 const dbkey = require("../config/db.config")
 const config = require("../config/db.config")
@@ -14,6 +16,8 @@ const DIRHTML = path.join(__dirname, '../mail/forgotpassword.html');
 const DIRHTMLUPDATE = path.join(__dirname, '../mail/updatepassword.html');
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
+const { decrypt, encrypt } = require('../auth/encrypt')
+const { createLogBO } = require('../services/userlog.service')
 
 var transporter = nodemailer.createTransport({
     host: config.mailHost,
@@ -86,7 +90,7 @@ exports.updatePassword = async (req, res) => {
                         html: htmlToSend
                     };
                     const MailInfo = 'Update Password: ' + req.body.EmailAddress;
-        
+
                     transporter.sendMail(mailOptions, function (error, info) {
                         if (error) {
                             SaveCareLog(error, '400', null, req.body.EmailAddress, 'SendEmail');
@@ -95,7 +99,7 @@ exports.updatePassword = async (req, res) => {
                             return (console.log('Email sent '));
                         }
                     });
-        
+
                 });
                 return res.json({
                     success: 200,
@@ -277,8 +281,26 @@ exports.findUser = (req, res) => {
     });
 };
 
+exports.encrypt = (req, res) => {
+    const text = req.params.text;
 
-exports.getLogin = (req, res) => {
+    const Encrypted = encrypt(text);
+    res.status(200).send({
+        data: Encrypted
+    })
+};
+
+exports.decrypt = (req, res) => {
+    const text = req.params.text;
+
+    const Decrypted = decrypt(text);
+    res.status(200).send({
+        data: Decrypted
+    })
+};
+
+
+exports.getLogin = async (req, res) => {
     const UserName = req.body.UserName;
     const password = req.body.Password;
     let condition = {
@@ -286,9 +308,17 @@ exports.getLogin = (req, res) => {
         IsActive: 1
     }
 
+    const checklogin = await getLoginAttempt(UserName)
+    var currAttempt = checklogin.LoginAttempt
+    if (currAttempt == null) {
+        currAttempt = 0
+    }
+    const TotalAttempt = currAttempt + 1
+
     getLoginUserJoin(condition, (err, results) => {
         if (err) {
-            console.log('test')
+            // console.log('test')
+            // updateAttempt(UserName, TotalAttempt)
             return res.status(400).send({
                 success: false,
                 message: err
@@ -298,20 +328,22 @@ exports.getLogin = (req, res) => {
             compare(password, results.Password, function (err, match) {
                 if (err) throw new Error(err);
                 else if (match == false) {
+                    // console.log(TotalAttempt)
+                    // updateAttempt(UserName, TotalAttempt)
                     return res.status(400).send({
                         success: false,
                         message: 'User atau Password salah'
                     })
                 } else {
-                    // const result = null;
                     results.Password = undefined;
                     const toToken = results.AgentID + results.UserID;
-                    const expiresIn = 30
+                    const expiresIn = 1
 
-                    const jsontoken = sign({ toToken }, dbkey.key, {
-                        expiresIn: `${expiresIn}m`
+                    const jsontoken = sign({ UserName: UserName, UserID: results.UserID }, dbkey.key, {
+                        expiresIn: `${expiresIn}h`
                     });
-                    return res.json({
+                    updateToken(UserName, jsontoken);
+                    return res.status(200).send({
                         success: true,
                         message: "Sukses Login",
                         user: results,
@@ -325,12 +357,234 @@ exports.getLogin = (req, res) => {
     });
 };
 
+exports.getLoginBO = async (req, res) => {
+    const UserName = req.body.UserName;
+    const password = req.body.Password;
+    let condition = {
+        UserName: UserName,
+        isActive: 1
+    }
+    const LoginResult = await getLoginUser(condition);
+    if (LoginResult == null) {
+        return res.status(200).send({
+            success: false,
+            message: 'User ' + UserName + ' tidak tersedia, silahkan cek kembali User Login Anda'
+        })
+
+    }
+    if (LoginResult.isLockOut == 1) {
+        return res.status(200).send({
+            success: false,
+            message: 'Akun Anda terkunci, silahkan hubungi Admin untuk membuka kembali akun Anda'
+        })
+
+    } else {
+
+        const checklogin = await getLoginAttempt(UserName)
+        var maxAttemptPass = 3
+        var currAttempt = checklogin.LoginAttempt
+        if (currAttempt == null) {
+            currAttempt = 0
+        }
+
+        compare(password, LoginResult.Password, async function (err, match) {
+            if (err) throw new Error(err);
+            else if (match == false) {
+                const TotalAttempt = currAttempt + 1
+                const AttemptLeft = maxAttemptPass - TotalAttempt
+                await updateLoginAttempt(UserName, TotalAttempt)
+                if (TotalAttempt > 2) {
+                    await nonActiveUser(UserName);
+                    await updateLoginAttempt(UserName, TotalAttempt)
+                    return res.status(200).send({
+                        success: false,
+                        message: 'Akun Anda terkunci, silahkan hubungi Admin untuk membuka kembali akun Anda'
+                    })
+                }
+                return res.status(200).send({
+                    success: false,
+                    message: 'Password Anda salah, Sisa percobaan Login Anda tinggal ' + AttemptLeft + ' kali lagi'
+                })
+            } else {
+                await createLogBO(LoginResult);
+                LoginResult.Password = undefined;
+                const toToken = LoginResult.AgentID + LoginResult.UserID;
+                const expiresIn = 1
+
+                const jsontoken = sign({ UserName: UserName, UserID: LoginResult.UserID }, dbkey.key, {
+                    expiresIn: `${expiresIn}h`
+                });
+                updateToken(UserName, jsontoken);
+                updateLoginAttempt(UserName, 0);
+                return res.status(200).send({
+                    success: true,
+                    message: "Sukses Login",
+                    user: LoginResult,
+                    token: jsontoken
+                })
+            }
+        });
+
+    }
+};
+
+exports.validateBackofficeToken = async (req, res) => {
+    try {
+        const bearerHeader = req.headers['authorization']
+        if (typeof bearerHeader === 'undefined') return unauthorized(req, res, 'Missing Authorization Token')
+        const token = bearerHeader.split(' ')[1]
+        console.log(token);
+        verify(token, dbkey.key, async (err, authData) => {
+            if (err && err.message === 'jwt expired') {
+                return res.status(200).send({
+                    success: 400,
+                    message: "Token Expired",
+
+                })
+            }
+            if (!authData) {
+                return res.status(200).send({
+                    success: 400,
+                    message: "Invalid Token",
+
+                })
+            }
+            const output = await getUserToken(authData.UserName)
+            if (output.SessionID === token)
+                return res.status(200).send({
+                    success: 200,
+                    message: "Token Valid",
+
+                })
+            else {
+                return res.status(200).send({
+                    success: 400,
+                    message: "Invalid Token",
+
+                })
+
+            }
+        })
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: 500,
+            message: "Internal Server Error",
+
+        })
+    }
+}
+
+exports.logoutBackoffice = async (req, res) => {
+    try {
+        const bearerHeader = req.headers['authorization']
+
+        if (typeof bearerHeader === 'undefined') {
+            return res.status(200).send({
+                success: 400,
+                message: 'Missing Authorization Token',
+
+            })
+        }
+        const token = bearerHeader.split(' ')[1]
+        console.log(token)
+        if (!token) {
+            return res.status(200).send({
+                success: 400,
+                message: 'Invalid Token',
+
+            })
+        }
+        verify(token, dbkey.key, async (err, authData) => {
+            if (err || !authData) {
+                return res.status(200).send({
+                    success: 400,
+                    message: 'Invalid Token',
+
+                })
+            }
+            console.log(authData)
+            const userid = authData.UserID
+            const userlogid = await getUserLastLogin(userid)
+            console.log(userlogid.UserLogID);
+            await updateUserLogout(userlogid.UserLogID)
+        })
+        await logoutUser(token);
+        return res.status(200).send({
+            success: 200,
+            message: 'Logged out succesfully',
+
+        })
+
+    }
+    catch (error) {
+        return res.status(500).send({
+            success: 500,
+            message: 'Internal Server Error',
+            data: error
+
+        })
+    }
+}
+
+exports.getlogoutBackoffice = async (req, res) => {
+    try {
+        const bearerHeader = req.headers['authorization']
+
+        if (typeof bearerHeader === 'undefined') {
+            return res.status(200).send({
+                success: 400,
+                message: 'Missing Authorization Token',
+
+            })
+        }
+        const token = bearerHeader.split(' ')[1]
+        console.log(token)
+        if (!token) {
+            return res.status(200).send({
+                success: 400,
+                message: 'Invalid Token',
+
+            })
+        }
+        verify(token, dbkey.key, async (err, authData) => {
+            if (err || !authData) {
+                return res.status(200).send({
+                    success: 400,
+                    message: 'Invalid Token',
+
+                })
+            }
+            console.log(authData)
+            const userid = authData.UserID
+            const userlogid = await getUserLastLogin(userid)
+            console.log(userlogid.UserLogID);
+            await updateUserLogout(userlogid.UserLogID)
+        })
+        await logoutUser(token);
+        return res.status(200).send({
+            success: 200,
+            message: 'Logged out succesfully',
+
+        })
+
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(500).send({
+            success: 500,
+            message: 'Internal Server Error',
+            data: error
+
+        })
+    }
+}
 exports.logout = (req, res) => {
     console.log('masuk');
-    
+
     return res.status(200).send({
         success: 200,
         message: "Sukses Logout",
-        
+
     })
 };

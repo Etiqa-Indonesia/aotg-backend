@@ -14,5 +14,31 @@ module.exports = {
         .then((res) => {
         }).catch((err) => {
         });
+    },
+    createLogBO : async (data) =>{
+        const Datalog ={
+            UserID : data.UserID,
+            LoginDate : Date.now()
+        };
+       await UserLog.create(Datalog)
+        .then((res) => {
+        }).catch((err) => {
+        });
+    },
+    getUserLastLogin : async (userID) => {
+        return await UserLog.findOne({
+            attributes: ['UserLogID'],
+            where: { UserID: userID },
+            // order: 'UserLogID DESC'
+            order: [
+                ['UserLogID', 'DESC']
+            ],
+        })
+    },
+    updateUserLogout : async (UserLogID) => {
+        return await UserLog.update(
+            { LogoutDate: Date.now() },
+            { where: { UserLogID: UserLogID } }
+        )
     }
 }
