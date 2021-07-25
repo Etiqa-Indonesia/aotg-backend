@@ -12,6 +12,9 @@ module.exports = {
     },
 
     key: "E58740943C7A4A8C40463BA00C2132B6A6131FB832F2F32FC738EA4B62CD4249", //key is keys
+    keyCaptcha :"6LciDrkbAAAAAElaHKXiQnBdP2g4zgU9ib8KEjLj",
+    siteKeyCaptcha : "6LciDrkbAAAAAFkcqXvi5rcbuDWJhgFOHkI_JJCm",
+    domainKey :"192.168.112.113",
     // privatekey: "3A7A616F48A944A5",
     // publickey: "FEF492B8A11CE69B",
     // frontView_Upload :'/home/etiqa/eii_dsp/uploaded_chassis'

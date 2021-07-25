@@ -15,6 +15,7 @@ const path = require("path");
 const DIRHTML = path.join(__dirname, '../../mail/usermail.html');
 const config = require('../../config/db.config')
 const Global = require("../../services/global.service")
+const {keyReturnCaptcha} = require('../../auth/token_validation')
 
 const DataLog = {
     QuotationID: null,
@@ -555,3 +556,16 @@ exports.findDetailUser = async (req, res) => {
         })
     }
 };
+exports.returnkeyCaptcha = async(req,res)=> {
+
+    const returnResult = await keyReturnCaptcha(config.siteKeyCaptcha)
+
+    res.status(200).send({
+        success: 200,
+        key: returnResult,
+        bufferKey :config.KEY
+
+
+    });
+
+}

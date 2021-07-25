@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const cryptojs = require('crypto-js')
 const dbConfig = require('../config/db.config');
 const config = require('../config/db.config')
 
@@ -16,4 +17,10 @@ exports.decrypt = (text) => {
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return decrypted.toString();
+}
+
+exports.encryptjs = (text) => {
+    var ciphertext = cryptojs.AES.encrypt( dbConfig.siteKeyCaptcha,dbConfig.KEY).toString();
+
+    return ciphertext
 }

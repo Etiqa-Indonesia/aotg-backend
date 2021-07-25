@@ -1,7 +1,7 @@
 module.exports = app => {
     const user = require("../../controllers/backoffice/backoffice.controller");
     const agentcat = require("../../controllers/backoffice/agentcat.controller");
-    const { checktoken, validatetoken } = require("../../auth/token_validation")
+    const { checktoken, validatetoken, validateCaptcha } = require("../../auth/token_validation")
 
     let router = require("express").Router();
 

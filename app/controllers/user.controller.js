@@ -337,10 +337,10 @@ exports.getLogin = async (req, res) => {
                 } else {
                     results.Password = undefined;
                     const toToken = results.AgentID + results.UserID;
-                    const expiresIn = 1
+                    const expiresIn = 15
 
                     const jsontoken = sign({ UserName: UserName, UserID: results.UserID }, dbkey.key, {
-                        expiresIn: `${expiresIn}h`
+                        expiresIn: `${expiresIn}minutes`
                     });
                     updateToken(UserName, jsontoken);
                     return res.status(200).send({
@@ -409,10 +409,10 @@ exports.getLoginBO = async (req, res) => {
                 await createLogBO(LoginResult);
                 LoginResult.Password = undefined;
                 const toToken = LoginResult.AgentID + LoginResult.UserID;
-                const expiresIn = 1
+                const expiresIn = 15
 
                 const jsontoken = sign({ UserName: UserName, UserID: LoginResult.UserID }, dbkey.key, {
-                    expiresIn: `${expiresIn}h`
+                    expiresIn: `${expiresIn}minutes`
                 });
                 updateToken(UserName, jsontoken);
                 updateLoginAttempt(UserName, 0);

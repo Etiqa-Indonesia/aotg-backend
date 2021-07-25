@@ -8,6 +8,11 @@ const Password = decrypt(dbConfig.PASSWORD)
 const DBName = decrypt(dbConfig.DB)
 const HOST = decrypt(dbConfig.HOST)
 
+// var USER = dbConfig.USER
+// const Password = dbConfig.PASSWORD
+// const DBName = dbConfig.DB
+// const HOST = dbConfig.HOST
+
 const sequelize = new Sequelize(DBName, USER, Password, {
     host: HOST,
     dialect: dbConfig.dialect,
