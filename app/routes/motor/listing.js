@@ -47,20 +47,39 @@ router.get('/vehicles/test', (req, res, next) => {
 })
 
 router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), async (req, res, next) => {
-  let [regions, products, coverage_compr, coverage_tlo] = [
-    await MwClient.fetchRegions(),
-    await MwClient.fetchProducts(),
-    await MwClient.fetchCoverageDetails('0201', 'MOTO-COMPR'),
-    await MwClient.fetchCoverageDetails('0201', 'MOTO-TLO')
-  ]
+  
 
   const ToproList = await findTopro(req.params.AgentType);
+  console.log(ToproList);
   const RateList = await findRateCode(req.params.AgentType);
+
+  let coverageComprCare = null;
+  let coverageTLOCare = null;
+
+  if (ToproList[0].Topro) {
+    coverageComprCare = await MwClient.fetchCoverageDetails('0201',ToproList[0].Topro)
+  }
+  else{
+    coverageComprCare = await MwClient.fetchCoverageDetails('0201','MOTO-COMPR')
+  }
+
+  if (ToproList[1].Topro) {
+    coverageTLOCare = await MwClient.fetchCoverageDetails('0201',ToproList[1].Topro)
+  }
+  else{
+    coverageTLOCare = await MwClient.fetchCoverageDetails('0201','MOTO-TLO')
+  }
+
+  let [regions, products] = [
+    await MwClient.fetchRegions(),
+    await MwClient.fetchProducts()
+  ]
+ 
 
   const RateComprFix = [];
   const RateTLOFix = [];
 
-  const CoverageCompr = coverage_compr.data;
+  const CoverageCompr = coverageComprCare.data;
   for (let i = 0; i < CoverageCompr.length; i++) {
     for (let j = 0; j < RateList.length; j++) {
       if (CoverageCompr[i].code == RateList[j].RateCode) {
@@ -69,7 +88,7 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
     }
   }
 
-  const CoverageTLO = coverage_tlo.data;
+  const CoverageTLO = coverageTLOCare.data;
   for (let i = 0; i < CoverageTLO.length; i++) {
     for (let j = 0; j < RateList.length; j++) {
       if (CoverageTLO[i].code == RateList[j].RateCode) {
@@ -81,14 +100,17 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
   const ToproFix = []
 
   for (let i = 0; i < ToproList.length; i++) {
-    if (ToproList[i].Topro == 'MOTO-COMPR') {
+    // if (ToproList[i].Topro == 'MOTO-COMPR') {
+    //   const ToproDesc = ToproList[i].Topro
+    //   ToproFix.push(ToproDesc);
+    // }
+    // if (ToproList[i].Topro == 'MOTO-TLO') {
+    //   const ToproDesc = ToproList[i].Topro
+    //   ToproFix.push(ToproDesc);
+    // }
+
       const ToproDesc = ToproList[i].Topro
       ToproFix.push(ToproDesc);
-    }
-    if (ToproList[i].Topro == 'MOTO-TLO') {
-      const ToproDesc = ToproList[i].Topro
-      ToproFix.push(ToproDesc);
-    }
   }
 
   let lists = {

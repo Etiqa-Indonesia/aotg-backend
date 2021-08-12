@@ -43,7 +43,7 @@ module.exports = {
             });
 
     },
-    getMotorQuote: async (data, Role, callback) => {
+    getMotorQuote: async (data, Role, page,CustomerName, callback) => {
         let where = {}
         where.Status = data.Status
         where.TOC = data.TOC
@@ -53,11 +53,17 @@ module.exports = {
                 where: where,
                 include: [
                     {
+
                         model: Customer ,
-                        attributes: { exclude: ['QuotationID', 'CreateDate', 'UpdateDate'] }
+                        attributes: { exclude: [ 'CreateDate', 'UpdateDate'] },
+                        where: {
+                            CustomerName : { [Op.like]: `%${CustomerName}%` }
+                           }
 
                     }
                 ],
+                limit: 10,
+                offset: page * 10,
                 // raw: true,
                 attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI'],
                 order: [

@@ -12,7 +12,8 @@ const db = require("./app/models"); //auto call index.js
 
 const app = express();
 
-let whiteList = ['http://localhost:4200', 'http://192.168.112.113', 'https://uatechannel.etiqa.co.id'];
+let whiteList = ['http://localhost:4200', 'http://192.168.112.113', 'https://uatechannel.etiqa.co.id'
+                ,'http://192.168.112.113', 'https://aotg.etiqa.co.id','192.168.112.78'];
 let corsOptions = {
     origin: function (origin, callback) {
         if (whiteList.indexOf(origin) !== -1 || !origin) {

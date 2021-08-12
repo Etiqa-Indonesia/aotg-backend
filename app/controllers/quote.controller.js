@@ -26,8 +26,17 @@ const DIRBACK = path.join(__dirname, '../../uploads/backview');
 const DIRLEFT = path.join(__dirname, '../../uploads/leftview');
 const DIRRIGHT = path.join(__dirname, '../../uploads/rightview');
 const DIRINSIDE = path.join(__dirname, '../../uploads/insideview');
+
+//Resize
+const DIRLEFTR = path.join(__dirname, '../../uploads/leftviewResize/');
+const DIRFRONTR = path.join(__dirname, '../../uploads/frontviewResize/');
+const DIRBACKR = path.join(__dirname, '../../uploads/backviewResize/');
+const DIRRIGHTR = path.join(__dirname, '../../uploads/rightviewResize/');
+const DIRINSIDER = path.join(__dirname, '../../uploads/insideviewResize/');
+//
 const DirHTMLMailCreateQuote = path.join(__dirname, '../mail/createquotation.html');
 const config = require('../config/db.config');
+const sharp = require('sharp');
 // const sendmail = require("../services/test.service");
 
 
@@ -321,7 +330,7 @@ exports.CreateQuote = async (req, res) => {
             message: 'ID Type Customer tidak boleh kosong'
         });
     }
-    if (dataCustomer.BirthDate == null|| dataCustomer.BirthDate == '') {
+    if (dataCustomer.BirthDate == null || dataCustomer.BirthDate == '') {
         return res.status(400).json({
             success: false,
             message: 'Tanggal lahir Customer tidak boleh kosong'
@@ -493,7 +502,15 @@ exports.uploadFrontView = (req, res) => {
 
         if (req.file != null || undefined) {
             const filePath = req.file.path;
-            updateFrontView(id, filePath);
+            const newFilePathResize = DIRFRONTR + id + "_" + req.file.originalname
+            sharp(filePath)
+                .withMetadata()
+                .toFile(newFilePathResize, function (err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            updateFrontView(id, newFilePathResize);
             res.json({
                 success: true,
                 message: 'Image uploaded!'
@@ -531,7 +548,15 @@ exports.uploadBackView = (req, res) => {
         }
         if (req.file != null || undefined) {
             const filePath = req.file.path;
-            updateBackView(id, filePath);
+            const newFilePathResize = DIRBACKR + id + "_" + req.file.originalname
+            sharp(filePath)
+                .withMetadata()
+                .toFile(newFilePathResize, function (err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            updateBackView(id, newFilePathResize);
             res.json({
                 success: true,
                 message: 'Image uploaded!'
@@ -546,7 +571,7 @@ exports.uploadBackView = (req, res) => {
 
 };
 
-exports.uploadLeftView = (req, res) => {
+exports.uploadLeftView = async (req, res) => {
     const id = req.params.id;
 
     var storage = multer.diskStorage({
@@ -557,6 +582,8 @@ exports.uploadLeftView = (req, res) => {
             cb(null, id + "_" + file.originalname)
         }
     })
+
+    console.log(req.file)
 
     var upload = multer({
         storage: storage,
@@ -570,13 +597,25 @@ exports.uploadLeftView = (req, res) => {
         }
 
         if (req.file != null || undefined) {
+
             const filePath = req.file.path;
-            updateLeftView(id, filePath);
+            console.log(filePath)
+            const newFilePathResize = DIRLEFTR + id + "_" + req.file.originalname
+            sharp(filePath)
+                .withMetadata()
+                .toFile(newFilePathResize, function (err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            updateLeftView(id, newFilePathResize);
             res.json({
                 success: true,
                 message: 'Image uploaded!'
             });
         } else {
+
+
             res.status(201).json({
                 success: false,
                 message: 'No Image uploaded!'
@@ -611,7 +650,15 @@ exports.uploadRightView = (req, res) => {
 
         if (req.file != null || undefined) {
             const filePath = req.file.path;
-            updateRightView(id, filePath);
+            const newFilePathResize = DIRRIGHTR + id + "_" + req.file.originalname
+            sharp(filePath)
+                .withMetadata()
+                .toFile(newFilePathResize, function (err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            updateRightView(id, newFilePathResize);
             res.json({
                 success: true,
                 message: 'Image uploaded!'
@@ -651,7 +698,16 @@ exports.uploadInsideView = (req, res) => {
 
         if (req.file != null || undefined) {
             const filePath = req.file.path;
-            updateInsideView(id, filePath);
+
+            const newFilePathResize = DIRINSIDER + id + "_" + req.file.originalname
+            sharp(filePath)
+                .withMetadata()
+                .toFile(newFilePathResize, function (err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            updateInsideView(id, newFilePathResize);
             res.json({
                 success: true,
                 message: 'Image uploaded!'

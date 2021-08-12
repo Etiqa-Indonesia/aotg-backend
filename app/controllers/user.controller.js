@@ -308,6 +308,22 @@ exports.getLogin = async (req, res) => {
         IsActive: 1
     }
 
+    const LoginResult = await getLoginUser(condition);
+    if (LoginResult == null) {
+        return res.status(200).send({
+            success: false,
+            message: 'User ' + UserName + ' tidak tersedia, silahkan cek kembali User Login Anda'
+        })
+
+    }
+    if (LoginResult.isLockOut == 1) {
+        return res.status(200).send({
+            success: false,
+            message: 'Akun Anda terkunci, silahkan hubungi Admin untuk membuka kembali akun Anda'
+        })
+
+    }
+
     const checklogin = await getLoginAttempt(UserName)
     var currAttempt = checklogin.LoginAttempt
     if (currAttempt == null) {
