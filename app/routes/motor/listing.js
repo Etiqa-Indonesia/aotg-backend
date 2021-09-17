@@ -4,7 +4,7 @@ const apicache = require('apicache')
 // const cache = apicache.middleware
 const config = require('../../config/mw.config')
 const redis = require('redis')
-const { findRateCode, findTopro } = require('../../services/rate.service')
+const { findRateCode, findTopro,findRateCodeMaxSI } = require('../../services/rate.service')
 let redisCache = apicache.options({ redisClient: redis.createClient() }).middleware
 
 router.get('/countries', redisCache(config.cacheDuration), async (req, res, next) => {
@@ -50,7 +50,7 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
   
 
   const ToproList = await findTopro(req.params.AgentType);
-  console.log(ToproList);
+  const RateCodeMaxSI = await findRateCodeMaxSI(req.params.AgentType);
   const RateList = await findRateCode(req.params.AgentType);
 
   let coverageComprCare = null;
@@ -109,7 +109,11 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
     //   ToproFix.push(ToproDesc);
     // }
 
-      const ToproDesc = ToproList[i].Topro
+      // const ToproDesc = ToproList[i].Topro
+      const ToproDesc = {
+        Topro :ToproList[i].Topro,
+        Description : ToproList[i].Description
+      }
       ToproFix.push(ToproDesc);
   }
 
@@ -118,7 +122,8 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
     regions: regions.data,
     coverages: ToproFix,
     cov_compr: RateComprFix,
-    cov_tlo: RateTLOFix
+    cov_tlo: RateTLOFix,
+    max_si :RateCodeMaxSI
   }
   res.send(lists)
 })

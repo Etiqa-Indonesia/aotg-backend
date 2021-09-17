@@ -36,8 +36,10 @@
     "node-cron": "^3.0.0",
     "nodemailer": "^6.5.0",
     "nodemon": "^2.0.7",
+    "pdf-creator-node": "^2.2.3",
     "redis": "^3.0.2",
     "sequelize": "^6.5.0",
-    "sharp": "^0.28.3"
+    "sharp": "^0.28.3",
+    "universal-analytics": "^0.4.23"
   }
 }

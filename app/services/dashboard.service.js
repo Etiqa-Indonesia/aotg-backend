@@ -13,7 +13,7 @@ module.exports = {
                     attributes: [ 'Status',
                         [db.sequelize.fn('COUNT', db.sequelize.col('Status')), 'count'],
                         [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
-                        WHEN Status = '2' THEN 'Quote Reject' ELSE 'Quote Disetujui' END`), 'StatusQuote']
+                        WHEN Status = '2' THEN 'Quote Reject' WHEN Status='D' THEN 'Draft Quote' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                     ],
                     group: ['TOC', 'Status', 'StatusQuote'],
                 })
@@ -39,7 +39,7 @@ module.exports = {
                     attributes: ['Status',
                         [db.sequelize.fn('COUNT', db.sequelize.col('Status')), 'count'],
                         [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
-                        WHEN Status = '2' THEN 'Quote Reject' ELSE 'Quote Disetujui' END`), 'StatusQuote']
+                        WHEN Status = '2' THEN 'Quote Reject' WHEN Status='D' THEN 'Draft Quote' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                     ],
                     group: ['TOC', 'Status', 'AgentID', 'StatusQuote'],
                 })

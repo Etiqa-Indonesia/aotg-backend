@@ -21,6 +21,8 @@ module.exports = app => {
     router.get("/createrandomuserid",validatetoken, user.createRandomID);
     router.get("/findagentnotinuser",validatetoken, user.findAgentNotInUser);
 
+    router.post("/analytics",validatetoken, user.analytics);
+
     //Prefix
     app.use("/backoffice", router);
 }

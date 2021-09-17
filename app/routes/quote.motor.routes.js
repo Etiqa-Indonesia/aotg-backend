@@ -9,6 +9,7 @@ module.exports = app => {
 
     // Routes
     router.post("/createquote",checktoken,  quote.CreateQuote);
+    router.post("/senddraftquotation",checktoken,  quote.SendMailDraftQuoteUsingID);
     router.post("/approve/quote/:id",checktoken,  quote.ApproveQuote);
     router.put("/quotes/:id/uploadfrontview",checktoken, quote.uploadFrontView);
     router.put("/quotes/:id/uploadbackview",checktoken, quote.uploadBackView);
@@ -23,6 +24,8 @@ module.exports = app => {
     router.get("/quote/insideimage/:id",checktoken, quote.getImageInsideViewBase64);
 
     router.get("/platecodeinfo/:pcode",checktoken, quote.findPlateCode);
+
+    router.post("/createpdf",  quote.testCreatePDF);
 
     router.get("/vehicletypeallowed/agentype/:agentcatid/vehicletype/:vehicletype/:id",checktoken, vehicletype.findAllVehicleTypeAllowed);
 

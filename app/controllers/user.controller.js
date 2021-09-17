@@ -18,6 +18,7 @@ const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const { decrypt, encrypt } = require('../auth/encrypt')
 const { createLogBO } = require('../services/userlog.service')
+const {TrackEvent} =require('../services/global.service')
 
 var transporter = nodemailer.createTransport({
     host: config.mailHost,
@@ -299,7 +300,6 @@ exports.decrypt = (req, res) => {
     })
 };
 
-
 exports.getLogin = async (req, res) => {
     const UserName = req.body.UserName;
     const password = req.body.Password;
@@ -353,7 +353,7 @@ exports.getLogin = async (req, res) => {
                 } else {
                     results.Password = undefined;
                     const toToken = results.AgentID + results.UserID;
-                    const expiresIn = 15
+                    const expiresIn = 30
 
                     const jsontoken = sign({ UserName: UserName, UserID: results.UserID }, dbkey.key, {
                         expiresIn: `${expiresIn}minutes`
@@ -372,7 +372,6 @@ exports.getLogin = async (req, res) => {
 
     });
 };
-
 exports.getLoginBO = async (req, res) => {
     const UserName = req.body.UserName;
     const password = req.body.Password;
@@ -425,7 +424,7 @@ exports.getLoginBO = async (req, res) => {
                 await createLogBO(LoginResult);
                 LoginResult.Password = undefined;
                 const toToken = LoginResult.AgentID + LoginResult.UserID;
-                const expiresIn = 15
+                const expiresIn = 30
 
                 const jsontoken = sign({ UserName: UserName, UserID: LoginResult.UserID }, dbkey.key, {
                     expiresIn: `${expiresIn}minutes`
@@ -604,3 +603,4 @@ exports.logout = (req, res) => {
 
     })
 };
+

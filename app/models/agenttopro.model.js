@@ -7,6 +7,9 @@ module.exports = (sequelize, Sequelize) => {
         AgentCatID: {
             type: Sequelize.STRING(1),
             primaryKey: true
+        },
+        Description: {
+            type: Sequelize.STRING(50)
         }
 
     });

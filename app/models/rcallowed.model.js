@@ -6,6 +6,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         AgentCatID: {
             type: Sequelize.STRING(1)
+        },
+        MaxSI: {
+            allowNull: true,
+            type: Sequelize.FLOAT()
         }
 
     });

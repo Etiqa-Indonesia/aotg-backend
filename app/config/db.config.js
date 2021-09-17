@@ -23,6 +23,7 @@ module.exports = {
     savePolicyCareURL: "http://192.168.112.100/WebAPI/MiddlewareAPI/SavePolicy",
     submitPolicyCareURL: "http://192.168.112.100/WebAPI/MiddlewareAPI/SubmitPolicy",
     efilePolicyCareURL: "http://192.168.112.100/WebAPI/MiddlewareAPI/EFile",
+    gaTrackingID : 'UA-186333861-1',
 
     // mailHost: "smtp.gmail.com",
     // mailPort: 5887,

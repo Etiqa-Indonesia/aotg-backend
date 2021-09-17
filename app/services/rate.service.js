@@ -40,4 +40,13 @@ module.exports = {
             }
         )
     },
+    findRateCodeMaxSI : async(data) =>{
+        return await RCAllowed.findAll(
+            {
+                where: {AgentCatID : data},
+                attributes: ['RateCode','MaxSI']
+
+            }
+        )
+    },
 }

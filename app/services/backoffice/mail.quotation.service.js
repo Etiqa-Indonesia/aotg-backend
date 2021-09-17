@@ -59,14 +59,14 @@ const SaveCareLog = (ResponseCareUser, StatusCode, ID, ParamSend, Config) => {
 module.exports = {
     SendMail: async (data) => {
         console.log(data);
-        
+
         if (data.Email[0]) {
             readHTMLFile(data.Pathfile, function (err, html) {
                 var template = handlebars.compile(html);
                 var replacements = {
                     Name: data.Name,
                     LinkBackOffice: config.linkBackOffice,
-                    QuotationID : data.QuotationID
+                    QuotationID: data.QuotationID
                 };
                 var htmlToSend = template(replacements);
                 var mailOptions = {
@@ -94,12 +94,23 @@ module.exports = {
         }
 
     },
-    SendMailTest: async (callback) =>{
+    SendMailTest: async (callback) => {
+
+        const attachments = [
+            {
+                filename: '87_CS3.pdf',
+                //path: path.join(__dirname, '../../quotationdraft/'),
+                path: path.join(__dirname, '../../../quotationdraft/', '87_CS3.pdf'),
+                contentType: 'application/pdf'
+            }
+        ];
+
+
         var mailOptions = {
             from: config.mailUser,
             to: 'rhega.rofiat@etiqa.co.id',
             subject: "Test Send mail using Domain Etiqa",
-            html: 'Test'
+            attachments: attachments
         };
 
         transporter.sendMail(mailOptions, function (error, info) {
@@ -110,6 +121,91 @@ module.exports = {
                 return callback(null, info);
             }
         });
+
+    },
+
+    SendMailDraftQuptation: async (to, subject, filename, paths, id, MailInfo) => {
+        const pathhtmluser = path.join(__dirname, '../../mail/calculatequoteuserinfo.html')
+
+        readHTMLFile(pathhtmluser, function (err, html) {
+            var template = handlebars.compile(html);
+
+            const attachments = [
+                {
+                    filename: filename,
+                    //path: path + '/' + filename
+                    path: path.join(__dirname, '../../../quotationdraft/', filename),
+                }
+            ];
+            var replacements = {
+            };
+
+            var htmlToSend = template(replacements);
+            var mailOptions = {
+                from: config.mailUser,
+                to: to,
+                subject: subject,
+                attachments: attachments,
+                html: htmlToSend
+            };
+            const EmailInfo = 'Email sent to : ' + to + ', untuk Informasi Quotation';
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    SaveCareLog(EmailInfo, '200', id, id, 'SendEmail');
+                    (console.log('Email sent to: ' + to));
+                }
+            });
+
+        });
+
+    },
+    SendMailDraftQuoteUsingID: async (to, subject, filename, id) => {
+        const pathhtmluser = path.join(__dirname, '../../mail/calculatequoteuserinfo.html')
+
+        const DirFile = path.join(__dirname, '../../../quotationdraft/', filename)
+
+        if (fs.existsSync(DirFile)) {
+            readHTMLFile(pathhtmluser, function (err, html) {
+                var template = handlebars.compile(html);
+
+                const attachments = [
+                    {
+                        filename: filename,
+                        //path: path + '/' + filename
+                        path: DirFile,
+                    }
+                ];
+                var replacements = {
+                };
+
+                var htmlToSend = template(replacements);
+                var mailOptions = {
+                    from: config.mailUser,
+                    to: to,
+                    subject: subject,
+                    attachments: attachments,
+                    html: htmlToSend
+                };
+                const EmailInfo = 'Email sent to : ' + to + ', untuk Informasi Quotation';
+                transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        SaveCareLog(EmailInfo, '200', id, id, 'SendEmail');
+                        (console.log('Email sent to: ' + to));
+                    }
+                });
+
+            });
+
+            return 'Exist'
+        } else {
+            return  'Not Exist'
+        }
+
+
 
     }
 

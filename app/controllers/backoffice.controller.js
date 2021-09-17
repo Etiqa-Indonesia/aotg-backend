@@ -4,7 +4,7 @@ const Op = db.Sequelize.Op;
 const { genSaltSync, hashSync } = require("bcrypt");
 const {  createUser, createAgent, updateUser,updateAgent, findAllAgent, findDetailAgent} = require("../services/backoffice.service")
 const dbkey = require("../config/db.config")
-
+const {TrackEvent} =require('../services/global.service')
 
 
 exports.createUser = (req, res) => {
@@ -195,3 +195,25 @@ exports.findDetailAgent = async (req, res) => {
         })
     }
 };
+
+exports.analytics = async (req, res) => {
+    try {
+
+        const data = req.body;
+        // await trackEvent('policy_generated','V000217','B4', 3010)
+        
+        await TrackEvent(data)
+        return res.status(200).send({
+            success: 200,
+            message: "Sukses",
+    
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(200).send({
+            success: 400,
+            message: error,
+    
+        })
+    }
+}

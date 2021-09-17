@@ -82,9 +82,11 @@ module.exports = {
             AllVTAllowed.push(VTIDObject);
         }
 
-        for (let index = 0; index < data.RateCode.length; index++) {
+        for (let index = 0; index < data.RateDetails.length; index++) {
+            // console.log(data.RateDetails[index]["RateCode"])
             const RateCodeObject = {
-                RateCode: data.RateCode[index],
+                RateCode: data.RateDetails[index]["RateCode"],
+                MaxSI: data.RateDetails[index]["MaxSI"],
                 AgentCatID: data.AgentCatID
             }
             AllRCAllowed.push(RateCodeObject);
@@ -109,6 +111,7 @@ module.exports = {
 
             })
         }
+        console.log(AllRCAllowed)
         
 
         await destroyRCAllowed(data);

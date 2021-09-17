@@ -1,4 +1,5 @@
 const db = require("../models");
+var pdf = require("pdf-creator-node");
 const Quote = db.Quotation;
 const QuoteLog = db.QuotationLog;
 const QuoteDetailMV = db.QuotationMV;
@@ -12,12 +13,24 @@ const MwClient = require('../mw/motor/mw.motor.client');
 const config = require("../config/mw.config");
 const configdb = require("../config/db.config");
 const fs = require('fs');
+const path = require('path');
+const { numberWithCommas } = require('./global.service');
+const { info } = require("console");
+const DIRDRAFTQUOT = path.join(__dirname, '../../quotationdraft/');
+const {SendMailDraftQuptation} = require('../services/backoffice/mail.quotation.service')
+const DirHTMLMailCreateQuote = path.join(__dirname, '../mail/calculatequotation.html');
 
-// const convertdatedb  = (data) => {
-//     var DateDB = new Date(data).toLocaleString();
-//     var res = DateDB.slice(0, 9);
-//     return res
-// }
+var html = fs.readFileSync(DirHTMLMailCreateQuote, "utf8")
+var options = {
+    format: "A3",
+    orientation: "landscape",
+    border: "10mm",
+    // header: {
+    //     "height": "30mm",
+    //     "contents": "<div style='text-align: left;'><img src='https://uatechannel.etiqa.co.id/static/etiqa.png' style='width: 150px;'</div>"
+    // }
+};
+
 
 const formatDate = (date) => {
     var d = new Date(date),
@@ -47,6 +60,103 @@ const ReffNo = (dataquot) => {
 }
 
 module.exports = {
+    createDraftQuotation: async (data, id) => {
+        var Jaminan_Dasar = null;
+        var Nilai_TOC = null;
+        var Coverages = [];
+
+        for (let i = 0; i < data.premium_details.length; i++) {
+            if (data.premium_details[i]['is_main'] == "1") {
+                Jaminan_Dasar = data.premium_details[i]['coverage_detail']
+                Nilai_TOC = await numberWithCommas(data.premium_details[i]['amount'])
+            }
+            if (data.premium_details[i]['is_main'] == "0") {
+
+                const DetailCoverage = {
+                    CoverageDetail: null,
+                    CoveragesValue: null,
+                    CoverageDetailPrintBottom: null
+                }
+
+                if (data.premium_details[i]['coverage_code'] == "TPL-01-17") {
+
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_2)
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+                }
+                else if (data.premium_details[i]['coverage_code'] == "PA-01") {
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_3)
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+
+                }
+                else if (data.premium_details[i]['coverage_code'] == "PA-02") {
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_4)
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+                }
+                else {
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail']
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+                }
+                Coverages.push(DetailCoverage)
+            }
+
+        }
+        try {
+            var outputpdf ='MotorVehicle_'+ id + '_' + data.customer_detail.name + '.pdf'
+            
+            var document = {
+                html: html,
+                data: {
+                    Name : data.customer_detail.name,
+                    quote: id,
+                    Jaminan_Dasar: Jaminan_Dasar,
+                    Discount: data.discount_pct,
+                    Tahun_Pembuatan: data.vehicle_detail.manufactured_year,
+                    Start: data.inception_date,
+                    End: data.printquotationdata.end_date,
+                    Nilai_TOC: Nilai_TOC,
+                    Coverages: Coverages,
+                    Plat: data.vehicle_detail.license_number,
+                    Lokasi: data.printquotationdata.lokasi,
+                    Wilayah: data.printquotationdata.wilayah,
+                    Merek: data.printquotationdata.merek,
+                    Model: data.printquotationdata.model,
+                    Type: data.printquotationdata.type,
+                    Rangka: data.vehicle_detail.chassis_number,
+                    Nomor_Mesin: data.vehicle_detail.engine_number,
+                    Nilai_Pertanggungan: await numberWithCommas(data.sum_insured_1),
+                    Total: await numberWithCommas(data.total_premium),
+                    Biaya: await numberWithCommas(data.premium_details[0].admin_fee),
+                    Materai: await numberWithCommas(data.total_stamp_duty),
+                    TotalDiscount: await numberWithCommas(data.total_discount),
+                    GrandTotal: await numberWithCommas(data.total_payable)
+
+                },
+                path: DIRDRAFTQUOT + outputpdf,
+                type: "",
+            };
+        } catch (error) {
+            console.log(error)
+        }
+
+        try {
+          await pdf.create(document, options)
+
+        } catch (error) {
+            console.log(error)
+        }
+
+        let Info = {
+            outputpdf: outputpdf,
+            dir: DIRDRAFTQUOT + '/' + outputpdf
+        };
+
+        return Info
+
+    },
     updateQuotationforPolicy: async (id, data) => {
         // console.log(id,data);
         await Quote.update({
@@ -569,9 +679,9 @@ module.exports = {
             .then((data) => {
                 if (data[0] != null) {
                     try {
-                        console.log('Masuk Update')
                         Customer.update({
-                            UpdateDate: Date.now()
+                            UpdateDate: Date.now(),
+                            Email : datasend.Email
                         }, {
                             where: {
                                 CustomerID: data[0].CustomerID
@@ -652,5 +762,102 @@ module.exports = {
                 QuotationID: id
             }
         })
-    }
+    },
+
+    testCreatePDF: async (data, id) => {
+        var Jaminan_Dasar = null;
+        var Nilai_TOC = null;
+        var Coverages = [];
+
+        for (let i = 0; i < data.premium_details.length; i++) {
+            if (data.premium_details[i]['is_main'] == "1") {
+                Jaminan_Dasar = data.premium_details[i]['coverage_detail']
+                Nilai_TOC = await numberWithCommas(data.premium_details[i]['amount'])
+            }
+            if (data.premium_details[i]['is_main'] == "0") {
+
+                const DetailCoverage = {
+                    CoverageDetail: null,
+                    CoveragesValue: null,
+                    CoverageDetailPrintBottom: null
+                }
+
+                if (data.premium_details[i]['coverage_code'] == "TPL-01-17") {
+
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_2)
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+                }
+                else if (data.premium_details[i]['coverage_code'] == "PA-01") {
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_3)
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+
+                }
+                else if (data.premium_details[i]['coverage_code'] == "PA-02") {
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_4)
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+                }
+                else {
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail']
+                    DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
+                    DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
+                }
+                Coverages.push(DetailCoverage)
+            }
+
+        }
+        try {
+            var outputpdf = id + '_' + data.customer_detail.name + '.pdf'
+            
+            var document = {
+                html: html,
+                data: {
+                    quote: id,
+                    Jaminan_Dasar: Jaminan_Dasar,
+                    Discount: data.discount_pct,
+                    Tahun_Pembuatan: data.vehicle_detail.manufactured_year,
+                    Start: data.inception_date,
+                    End: data.printquotationdata.end_date,
+                    Nilai_TOC: Nilai_TOC,
+                    Coverages: Coverages,
+                    Plat: data.vehicle_detail.license_number,
+                    Lokasi: data.printquotationdata.lokasi,
+                    Wilayah: data.printquotationdata.wilayah,
+                    Merek: data.printquotationdata.merek,
+                    Model: data.printquotationdata.model,
+                    Type: data.printquotationdata.type,
+                    Rangka: data.vehicle_detail.chassis_number,
+                    Nomor_Mesin: data.vehicle_detail.engine_number,
+                    Nilai_Pertanggungan: await numberWithCommas(data.sum_insured_1),
+                    Total: await numberWithCommas(data.total_premium),
+                    Biaya: await numberWithCommas(data.premium_details[0].admin_fee),
+                    Materai: await numberWithCommas(data.total_stamp_duty),
+                    TotalDiscount: await numberWithCommas(data.total_discount),
+                    GrandTotal: await numberWithCommas(data.total_payable)
+
+                },
+                path: DIRDRAFTQUOT + outputpdf,
+                type: "",
+            };
+        } catch (error) {
+            console.log(error)
+        }
+
+        try {
+          await pdf.create(document, options)
+
+        } catch (error) {
+            console.log(error)
+        }
+
+        let Info = {
+            outputpdf: outputpdf,
+            dir: DIRDRAFTQUOT + '/' + outputpdf
+        };
+
+        return Info
+
+    },
 }

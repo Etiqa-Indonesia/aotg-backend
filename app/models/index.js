@@ -21,12 +21,12 @@ const sequelize = new Sequelize(DBName, USER, Password, {
         freezeTableName: true,
         timestamps :false
     },
-     timezone: '+07:00',
-    // dialectOptions: {
-    //     options: {
-    //       useUTC: false, // for reading from database
-    //     },
-    //   },
+    timezone: '+07:00',
+    dialectOptions: {
+        options: {
+          useUTC: false, // for reading from database
+        },
+      },
 
     pool: {
         max: dbConfig.pool.max,

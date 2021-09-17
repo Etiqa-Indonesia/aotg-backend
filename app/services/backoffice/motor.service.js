@@ -10,6 +10,7 @@ module.exports = {
     getMotorDashboard: async (data, callback) => {
         let where = {}
         where.TOC = data.TOC
+        where.Status = { [Op.ne]: 'D' }
         // if (createdAtFrom && createdAtTo && createdAtFrom != 'null' && createdAtTo != 'null') {
         //     let createdFrom = new Date(createdAtFrom)
         //     let createdTo = new Date(createdAtTo)
@@ -26,7 +27,8 @@ module.exports = {
                     [db.Sequelize.literal(`CASE WHEN Status ='0' THEN 'Quote Dibuat' 
                         WHEN Status = '2' THEN 'Quote Reject' ELSE 'Quote Disetujui' END`), 'StatusQuote']
                 ],
-                group: ['TOC', 'Status', 'StatusQuote'],
+                group: ['TOC', 'Status', 'StatusQuote']
+                // order: ['UpdateDate', 'DESC']
             })
             .then((data) => {
                 if (data != null) {

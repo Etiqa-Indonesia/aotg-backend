@@ -1,7 +1,7 @@
 module.exports = app => {
     const user = require("../controllers/user.controller.js");
     const userbo = require('../controllers/backoffice/backoffice.controller')
-    const { checktoken,validateCaptcha, keyReturnCaptcha } = require("../auth/token_validation")
+    const { checktoken,validateCaptcha, keyReturnCaptcha, refreshtoken } = require("../auth/token_validation")
     const {testSendMail} = require("../services/test.service")
     const { decrypt, encrypt } = require('../auth/encrypt')
 
@@ -18,6 +18,7 @@ module.exports = app => {
     router.post("/login", user.getLogin);
     router.post("/backoffice/login", validateCaptcha, user.getLoginBO);
     router.get("/backoffice/captchakey", userbo.returnkeyCaptcha )
+    router.get("/backoffice/refreshtoken", refreshtoken)
     router.post("/logout", user.logoutBackoffice);
     //router.get("/logout/invalidatetoken", user.getlogoutBackoffice);
     router.get("/token/validate",  user.validateBackofficeToken);

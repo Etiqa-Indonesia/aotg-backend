@@ -29,7 +29,7 @@ module.exports = app => {
     router.post("/submitagentdependencies",validatetoken, agentcat.submitAgentDependencies);
 
 
-    router.post("/sendmail",validatetoken, backoffice.sendmailtest);
+    router.post("/sendmail", backoffice.sendmailtest);
     
 
     //Prefix

@@ -7,12 +7,13 @@ const { createCoverageDetail, createQuote, createQuoteLogBackOffice,
     createorupdateCustomer, updateCustomerQuotation,
     getQuotebyPK, getImagebyPK, ApproveQuoteByPK, updateInsideView,
     updateQuotationforPolicy, updateQuotationforSubmitPolicy, updateQuotationforQuoteBackOffice,
-    updateQuotation, updateQuoteDetail, updateCoverageDetail, rejectQuotationforBackOffice } = require("../services/quotation.service");
+    updateQuotation, updateQuoteDetail, updateCoverageDetail, rejectQuotationforBackOffice, createDraftQuotation, testCreatePDF } = require("../services/quotation.service");
 const { createResponseLog } = require("../services/responselog.service");
 const { SaveUser, SavePolicy, SubmitPolicy } = require("../services/care.service");
-const { SendMail } = require("../services/backoffice/mail.quotation.service");
+const { SendMail, SendMailDraftQuptation, SendMailDraftQuoteUsingID } = require("../services/backoffice/mail.quotation.service");
 const { findMarketingEmailByAgentID } = require('../services/agenthandler.service');
 const { findPlateCode } = require('../services/platecode.service');
+const { sendMail } = require('../services/global.service')
 const multer = require('multer');
 const path = require("path");
 const fs = require('fs');
@@ -61,6 +62,29 @@ const SaveCareLog = (ResponseCareUser, StatusCode, ID, ParamSend, Config) => {
     DataLog.Response = ResponseCareUser
 
     createResponseLog(DataLog);
+}
+
+exports.SendMailDraftQuoteUsingID = async (req, res) => {
+    const QuotationID = req.body.quotationid;
+    const EmailCust = req.body.email;
+    const FileName = 'MotorVehicle_'+ QuotationID + '_' + req.body.name + '.pdf'
+
+    const result = await SendMailDraftQuoteUsingID(EmailCust, 'Premium Calculation Draft', FileName, QuotationID)
+    console.log(result)
+
+    if (result != 'Exist') {
+        res.status(400).send({
+            'code': '400',
+            'message': 'Failed, File Direktori ' + FileName + ' tidak ditemukan',
+        })
+    }
+    else {
+        res.status(200).send({
+            'code': '200',
+            'message': 'Success, Kirim Email '
+        })
+    }
+
 }
 
 exports.getQuotebyPK = async (req, res) => {
@@ -222,6 +246,18 @@ exports.RejectQuote = async (req, res) => {
 
 };
 
+exports.testCreatePDF = async (req, res) => {
+    const INFO = await testCreatePDF(req.body, 1000)
+
+    res.status(200).json({
+        status: 200,
+        message: INFO
+    });
+
+};
+
+
+
 exports.CreateQuote = async (req, res) => {
     var d = new Date(req.body.inception_date);
     var EndDate = d.setFullYear(d.getFullYear() + 1);
@@ -259,7 +295,8 @@ exports.CreateQuote = async (req, res) => {
         IsSubmittedCare: 0,
         MailSent: 0,
         MailFetchTries: 0,
-        Remarks: req.body.remarks
+        Remarks: req.body.remarks,
+        CreateDate : Date.now()
     };
 
 
@@ -310,7 +347,8 @@ exports.CreateQuote = async (req, res) => {
         Address: Customer.address_1,
         City: Customer.city,
         ZipCode: Customer.zipcode,
-        AgentID: req.body.agentid
+        AgentID: req.body.agentid,
+        CreateDate : Date.now()
     };
     if (Customer.name == undefined || dataCustomer.CustomerName == null) {
         return res.status(400).json({
@@ -330,151 +368,274 @@ exports.CreateQuote = async (req, res) => {
             message: 'ID Type Customer tidak boleh kosong'
         });
     }
+    if (dataQuotes.Status == null) {
+        return res.status(400).json({
+            success: false,
+            message: 'Status Quote tidak boleh kosong'
+        });
+    }
     if (dataCustomer.BirthDate == null || dataCustomer.BirthDate == '') {
         return res.status(400).json({
             success: false,
             message: 'Tanggal lahir Customer tidak boleh kosong'
         });
     }
+    const PrintData = req.body.printquotationdata;
 
-
-
-    // if (Customer.name == undefined || dataCustomer.IDNo == null
-    //     || dataCustomer.IDType == null || dataCustomer.CustomerName == null || dataCustomer.BirthDate == null|| dataCustomer.BirthDate == '') {
-    //     res.status(400).json({
-    //         success: false,
-    //         suspect: {
-    //             Customer: 'Data Customer Kosong atau',
-    //             IDNo: 'ID Number Kosong atau ',
-    //             IDType: 'ID Type Kosong atau',
-    //             CustomerName: 'Nama Customer Kosong',
-    //             BirthDate: 'Tanggal Lahir Kosong'
-
-    //         },
-    //         message: 'Cek kembali lemparan Anda'
-    //     });
-    // }
-    if (VehicleDetails.brand == undefined) {
-
-        return res.status(201).json({
+    if (!PrintData && dataQuotes.Status.toLowerCase() == "d" ) {
+        return res.status(400).json({
             success: false,
-            message: 'Data Kendaraan Kosong'
+            message: 'Parameter Print Quotation Kosong'
         });
     }
-    else {
-        if (QuotationID != null) {
-            updateQuotation(QuotationID, dataQuotes, async (err, results) => {
-                if (err) {
-                    return res.json({
-                        message: err
-                    });
+
+    if (QuotationID != null) {
+        updateQuotation(QuotationID, dataQuotes, async (err, results) => {
+            if (err) {
+                return res.json({
+                    message: err
+                });
+            }
+            else {
+
+                if (dataQuotes.Status.toLowerCase() == "d") {
+                    try {
+                        const Info = await createDraftQuotation(req.body, QuotationID);
+                        console.log('Sukses create PDF: ' + Info)
+                    } catch (error) {
+                        console.log('error create pdf: '+ error)
+                    }
+                    
+
+                    try {
+                        await SendMailDraftQuptation(dataCustomer.Email, 'Premium Calculation Draft', Info.outputpdf, Info.dir, QuotationID, 'Quotation Draft');
+                    } catch (error) {
+                        console.log(error)
+                    }
                 }
-                else {
+                createorupdateCustomer(dataCustomer, (err, resultsC) => {
+                    updateCustomerQuotation(QuotationID, resultsC);
+                    customerresult = resultsC;
+
+                });
+                const DataUpdate = {
+                    Message: "Update Data Quotation " + QuotationID
+                }
+
+                dataVehicle.QuotationID = QuotationID;
+                DataLog.QuotationID = QuotationID;
+                DataLog.Response = JSON.stringify(DataUpdate);
+                console.log(DataLog)
+
+                createResponseLog(DataLog);
+                updateQuoteDetail(dataVehicle);
+                const dataQuolog = {
+                    QuotationID: QuotationID,
+                    Remarks: "Resubmit Quote",
+                    Status: dataQuotes.Status,
+                    UserID: req.body.userid
+                };
+
+                createQuoteLogBackOffice(dataQuolog);
+                updateCoverageDetail(PremiumDetails, QuotationID,
+                    req.body.sum_insured_1, req.body.discount_pct);
+
+
+                res.status(200).send({
+                    data: req.body
+                });
+            }
+
+        });
+
+    } else {
+        createQuote(dataQuotes, async (err, results) => {
+            if (err) {
+                return res.json({
+                    message: err
+                });
+            }
+            else {
+                try {
+                    var Info = null;
+
+                    if (dataQuotes.Status.toLowerCase() == "d") {
+                        Info = await createDraftQuotation(req.body, results.QuotationID);
+                        try {
+                            await SendMailDraftQuptation(dataCustomer.Email, 'Premium Calculation Draft', Info.outputpdf, Info.dir, results.QuotationID, 'Quotation Draft');
+                        } catch (error) {
+                            console.log(error)
+                        }
+                        //await SendMailDraftQuptation(data.customer_detail.email, 'Premium Calculation Vehicle', outputpdf, DIRDRAFTQUOT, data, 'Send Draft Calculation Quote')
+                    }
                     createorupdateCustomer(dataCustomer, (err, resultsC) => {
-                        // console.log(results);
-                        updateCustomerQuotation(QuotationID, resultsC);
+                        updateCustomerQuotation(results.QuotationID, resultsC);
                         customerresult = resultsC;
 
-                        // results.CustomerID = resultsC;
-
                     });
-                    const DataUpdate = {
-                        Message: "Update Data Quotation " + QuotationID,
-                        data: req.body
-                    }
-
-                    dataVehicle.QuotationID = QuotationID;
-                    DataLog.QuotationID = QuotationID;
-                    DataLog.Response = JSON.stringify(DataUpdate);
-
+                    dataVehicle.QuotationID = results.QuotationID;
+                    DataSendMail.QuotationID = results.QuotationID;
+                    DataLog.QuotationID = results.QuotationID;
+                    DataLog.Response = JSON.stringify(results);
                     createResponseLog(DataLog);
-                    updateQuoteDetail(dataVehicle);
+                    createQuoteDetail(dataVehicle);
+                    //createQuoteLog(results);
+
                     const dataQuolog = {
-                        QuotationID: QuotationID,
-                        Remarks: "Resubmit Quote",
-                        Status: config.statusNew,
+                        QuotationID: results.QuotationID,
+                        Remarks: "Create Quote",
+                        Status: dataQuotes.Status,
                         UserID: req.body.userid
                     };
 
                     createQuoteLogBackOffice(dataQuolog);
-                    updateCoverageDetail(PremiumDetails, QuotationID,
+
+                    SendMail(DataSendMail);
+
+
+
+                    createCoverageDetail(PremiumDetails, results.QuotationID,
                         req.body.sum_insured_1, req.body.discount_pct);
 
-
-                    res.status(200).send({
-                        data: req.body
+                    await res.status(200).send({
+                        results
                     });
-                }
 
-            });
-
-        } else {
-            createQuote(dataQuotes, async (err, results) => {
-                if (err) {
-                    return res.json({
-                        message: err
-                    });
-                }
-                else {
-                    try {
-                        // const CustomerExist = await checkExistCustomer(dataCustomer)
-                        // if (!CustomerExist) {
-                        //     console.log('Masuk Customer Insert')
-                        //     const resultCustomer = await createCustomer(dataCustomer)
-                        //     console.log(resultCustomer)
-                        //     updateCustomerQuotation(results.QuotationID, resultCustomer.CustomerID);
-                        // }
-                        // else {
-                        //     console.log(CustomerExist.CustomerID)
-                        //     console.log('Masuk Customer Update')
-                        //     await updateCustomer(CustomerExist.CustomerID)
-                        //     updateCustomerQuotation(results.QuotationID, resultCustomer.CustomerID);
-                        // }
-                        createorupdateCustomer(dataCustomer, (err, resultsC) => {
-                            // console.log(results);
-                            updateCustomerQuotation(results.QuotationID, resultsC);
-                            customerresult = resultsC;
-
-                            // results.CustomerID = resultsC;
-
-                        });
-                        dataVehicle.QuotationID = results.QuotationID;
-                        DataSendMail.QuotationID = results.QuotationID;
-                        DataLog.QuotationID = results.QuotationID;
-                        DataLog.Response = JSON.stringify(results);
-                        createResponseLog(DataLog);
-                        createQuoteDetail(dataVehicle);
-                        //createQuoteLog(results);
-
-                        const dataQuolog = {
-                            QuotationID: results.QuotationID,
-                            Remarks: "Create Quote",
-                            Status: config.statusNew,
-                            UserID: req.body.userid
-                        };
-
-                        createQuoteLogBackOffice(dataQuolog);
-
-                        SendMail(DataSendMail);
-
-                        createCoverageDetail(PremiumDetails, results.QuotationID,
-                            req.body.sum_insured_1, req.body.discount_pct);
-
-                        await res.status(200).send({
-                            results
-                        });
-
-                    } catch (error) {
-
-                    }
+                } catch (error) {
 
                 }
 
-            });
-        }
+            }
 
-
+        });
     }
+
+
+    // if (VehicleDetails.brand == undefined) {
+
+    //     return res.status(201).json({
+    //         success: false,
+    //         message: 'Data Kendaraan Kosong'
+    //     });
+    // }
+    // else {
+    //     if (QuotationID != null) {
+    //         updateQuotation(QuotationID, dataQuotes, async (err, results) => {
+    //             if (err) {
+    //                 return res.json({
+    //                     message: err
+    //                 });
+    //             }
+    //             else {
+
+    //                 if (dataQuotes.Status.toLowerCase() == "d") {
+    //                     const Info = await createDraftQuotation(req.body, QuotationID);
+
+    //                     try {
+    //                         await SendMailDraftQuptation(dataCustomer.Email, 'Premium Calculation Draft', Info.outputpdf, Info.dir, QuotationID, 'Quotation Draft');
+    //                     } catch (error) {
+    //                         console.log(error)
+    //                     }
+    //                 }
+    //                 createorupdateCustomer(dataCustomer, (err, resultsC) => {
+    //                     updateCustomerQuotation(QuotationID, resultsC);
+    //                     customerresult = resultsC;
+
+    //                 });
+    //                 const DataUpdate = {
+    //                     Message: "Update Data Quotation " + QuotationID
+    //                 }
+
+    //                 dataVehicle.QuotationID = QuotationID;
+    //                 DataLog.QuotationID = QuotationID;
+    //                 DataLog.Response = JSON.stringify(DataUpdate);
+    //                 console.log(DataLog)
+
+    //                 createResponseLog(DataLog);
+    //                 updateQuoteDetail(dataVehicle);
+    //                 const dataQuolog = {
+    //                     QuotationID: QuotationID,
+    //                     Remarks: "Resubmit Quote",
+    //                     Status: dataQuotes.Status,
+    //                     UserID: req.body.userid
+    //                 };
+
+    //                 createQuoteLogBackOffice(dataQuolog);
+    //                 updateCoverageDetail(PremiumDetails, QuotationID,
+    //                     req.body.sum_insured_1, req.body.discount_pct);
+
+
+    //                 res.status(200).send({
+    //                     data: req.body
+    //                 });
+    //             }
+
+    //         });
+
+    //     } else {
+    //         createQuote(dataQuotes, async (err, results) => {
+    //             if (err) {
+    //                 return res.json({
+    //                     message: err
+    //                 });
+    //             }
+    //             else {
+    //                 try {
+    //                     var Info = null;
+
+    //                     if (dataQuotes.Status.toLowerCase() == "d") {
+    //                         Info = await createDraftQuotation(req.body, results.QuotationID);
+    //                         try {
+    //                             await SendMailDraftQuptation(dataCustomer.Email, 'Premium Calculation Draft', Info.outputpdf, Info.dir, results.QuotationID, 'Quotation Draft');
+    //                         } catch (error) {
+    //                             console.log(error)
+    //                         }
+    //                         //await SendMailDraftQuptation(data.customer_detail.email, 'Premium Calculation Vehicle', outputpdf, DIRDRAFTQUOT, data, 'Send Draft Calculation Quote')
+    //                     }
+    //                     createorupdateCustomer(dataCustomer, (err, resultsC) => {
+    //                         updateCustomerQuotation(results.QuotationID, resultsC);
+    //                         customerresult = resultsC;
+
+    //                     });
+    //                     dataVehicle.QuotationID = results.QuotationID;
+    //                     DataSendMail.QuotationID = results.QuotationID;
+    //                     DataLog.QuotationID = results.QuotationID;
+    //                     DataLog.Response = JSON.stringify(results);
+    //                     createResponseLog(DataLog);
+    //                     createQuoteDetail(dataVehicle);
+    //                     //createQuoteLog(results);
+
+    //                     const dataQuolog = {
+    //                         QuotationID: results.QuotationID,
+    //                         Remarks: "Create Quote",
+    //                         Status: dataQuotes.Status,
+    //                         UserID: req.body.userid
+    //                     };
+
+    //                     createQuoteLogBackOffice(dataQuolog);
+
+    //                     SendMail(DataSendMail);
+
+
+
+    //                     createCoverageDetail(PremiumDetails, results.QuotationID,
+    //                         req.body.sum_insured_1, req.body.discount_pct);
+
+    //                     await res.status(200).send({
+    //                         results
+    //                     });
+
+    //                 } catch (error) {
+
+    //                 }
+
+    //             }
+
+    //         });
+    //     }
+
+
+    // }
 };
 
 exports.uploadFrontView = (req, res) => {

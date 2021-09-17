@@ -1,7 +1,8 @@
-const { verify } = require("jsonwebtoken");
+const { verify , sign} = require("jsonwebtoken");
 const dbkey = require("../config/db.config")
 const { getUserToken } = require('../services/user.service')
 const http = require('../mw/http')
+const { updateToken } = require('../services/user.service')
 const { encrypt, encryptjs } = require('../auth/encrypt')
 
 
@@ -61,6 +62,57 @@ module.exports = {
 
                     })
 
+                }
+            })
+        } else {
+            res.status(200).send({
+                success: 400,
+                message: "Access Denied Unauthorized User"
+
+            });
+        }
+
+    },
+    refreshtoken: (req, res, next) => {
+        let token = req.get("authorization");
+        if (token) {
+            token = token.slice(7);
+            verify(token, dbkey.key, async (err, authData) => {
+                if (err && err.message === 'jwt expired') {
+                    console.log(err)
+                    return res.status(200).send({
+                        success: 400,
+                        message: "Token Expired, Please Login Again",
+
+                    })
+                }
+                if (!authData) {
+                    return res.status(200).send({
+                        success: 400,
+                        message: "Invalid Token",
+
+                    })
+                }
+                const output = await getUserToken(authData.UserName)
+                if (output.SessionID === token) {
+                    const expiresIn = 15
+
+                    const jsontoken = sign({ UserName: authData.UserName, UserID: authData.UserID }, dbkey.key, {
+                        expiresIn: `${expiresIn}minutes`
+                    });
+                    await updateToken(authData.UserName,jsontoken)
+                    return res.status(200).send({
+                        success: 200,
+                        message: "Success Refresh Token",
+                        token: jsontoken
+                    })
+
+                }
+                else {
+                    return res.status(200).send({
+                        success: 400,
+                        message: "Invalid Token"
+                    })
                 }
             })
         } else {

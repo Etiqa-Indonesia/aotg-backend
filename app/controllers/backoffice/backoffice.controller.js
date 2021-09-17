@@ -7,7 +7,7 @@ const { createUser, findUserName, createAgent, updateUser, updateAgent, randomUs
     findUser, findDetailCustomer, findAllCustomer, findAllUser, findDetailUser, findUserMailUpdate, findProfileIDAgent } = require("../../services/backoffice/user.service")
 const { createResponseLog } = require("../../services/responselog.service");
 const { SendMailTest } = require("../../services/backoffice/mail.quotation.service")
-const {PasswordPolicy} = require('../../services/global.service')
+const {PasswordPolicy, TrackEvent} = require('../../services/global.service')
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const fs = require('fs');
@@ -568,4 +568,26 @@ exports.returnkeyCaptcha = async(req,res)=> {
 
     });
 
+}
+
+exports.analytics = async (req, res) => {
+    try {
+
+        const data = req.body;
+        // await trackEvent('policy_generated','V000217','B4', 3010)
+        
+        await TrackEvent(data)
+        return res.status(200).send({
+            success: 200,
+            message: "Sukses",
+    
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(200).send({
+            success: 400,
+            message: error,
+    
+        })
+    }
 }

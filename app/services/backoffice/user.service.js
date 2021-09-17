@@ -115,7 +115,8 @@ module.exports = {
             City: data.City,
             Status: data.Status,
             JoinedDate: data.JoinedDate,
-            TerminatedDate: data.TerminatedDate
+            TerminatedDate: data.TerminatedDate,
+            Type :data.Type
 
         }, {
             where: {
