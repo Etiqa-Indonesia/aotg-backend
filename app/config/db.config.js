@@ -57,5 +57,6 @@ module.exports = {
     KEY: "12345678901234567890123456789012",
     IV: "1234567890123456",
     ALGO: "aes-256-cbc",
+    mailMarketing:"rhega.rofiat@etiqa.co.id"
 
 };

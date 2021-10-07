@@ -67,7 +67,7 @@ const SaveCareLog = (ResponseCareUser, StatusCode, ID, ParamSend, Config) => {
 exports.SendMailDraftQuoteUsingID = async (req, res) => {
     const QuotationID = req.body.quotationid;
     const EmailCust = req.body.email;
-    const FileName = 'MotorVehicle_'+ QuotationID + '_' + req.body.name + '.pdf'
+    const FileName = 'MotorVehicle_' + QuotationID + '_' + req.body.name + '.pdf'
 
     const result = await SendMailDraftQuoteUsingID(EmailCust, 'Premium Calculation Draft', FileName, QuotationID)
     console.log(result)
@@ -296,7 +296,7 @@ exports.CreateQuote = async (req, res) => {
         MailSent: 0,
         MailFetchTries: 0,
         Remarks: req.body.remarks,
-        CreateDate : Date.now()
+        CreateDate: Date.now()
     };
 
 
@@ -321,14 +321,24 @@ exports.CreateQuote = async (req, res) => {
     DataLog.Param = JSON.stringify(req.body);
     DataLog.StatusCode = 200;
     DataLog.Response = null
-    var dataMarketing = await findMarketingEmailByAgentID(req.body.agentid)
+    const dataMarketing = await findMarketingEmailByAgentID(req.body.agentid)
     const listMail = []
-    for (let i = 0; i < dataMarketing.length; i++) {
-        const MailMarketing = dataMarketing[i]['ListUser.EmailAddress']
-        listMail.push(MailMarketing);
+    console.log(dataMarketing.length)
+
+
+    //Mail Marketing Dinamis
+    if (dataMarketing.length > 0) {
+        console.log('Masuk Marketing')
+        for (let i = 0; i < dataMarketing.length; i++) {
+            const MailMarketing = dataMarketing[i]['ListUser.EmailAddress']
+            listMail.push(MailMarketing);
+        }
     }
+    else
+        listMail.push(config.mailMarketing) // mail marketing statis
+
+    console.log(listMail);
     const DataSendMail = {
-        Name: req.body.agent_name,
         Pathfile: DirHTMLMailCreateQuote,
         Email: listMail,
         QuotationID: null
@@ -348,7 +358,7 @@ exports.CreateQuote = async (req, res) => {
         City: Customer.city,
         ZipCode: Customer.zipcode,
         AgentID: req.body.agentid,
-        CreateDate : Date.now()
+        CreateDate: Date.now()
     };
     if (Customer.name == undefined || dataCustomer.CustomerName == null) {
         return res.status(400).json({
@@ -382,7 +392,7 @@ exports.CreateQuote = async (req, res) => {
     }
     const PrintData = req.body.printquotationdata;
 
-    if (!PrintData && dataQuotes.Status.toLowerCase() == "d" ) {
+    if (!PrintData && dataQuotes.Status.toLowerCase() == "d") {
         return res.status(400).json({
             success: false,
             message: 'Parameter Print Quotation Kosong'
@@ -397,16 +407,15 @@ exports.CreateQuote = async (req, res) => {
                 });
             }
             else {
+                var Info = null;
 
                 if (dataQuotes.Status.toLowerCase() == "d") {
                     try {
-                        const Info = await createDraftQuotation(req.body, QuotationID);
-                        console.log('Sukses create PDF: ' + Info)
-                    } catch (error) {
-                        console.log('error create pdf: '+ error)
-                    }
-                    
 
+                        Info = await createDraftQuotation(req.body, QuotationID);
+                    } catch (error) {
+                        console.log('error create pdf: ' + error)
+                    }
                     try {
                         await SendMailDraftQuptation(dataCustomer.Email, 'Premium Calculation Draft', Info.outputpdf, Info.dir, QuotationID, 'Quotation Draft');
                     } catch (error) {
@@ -425,7 +434,7 @@ exports.CreateQuote = async (req, res) => {
                 dataVehicle.QuotationID = QuotationID;
                 DataLog.QuotationID = QuotationID;
                 DataLog.Response = JSON.stringify(DataUpdate);
-                console.log(DataLog)
+                // console.log(DataLog)
 
                 createResponseLog(DataLog);
                 updateQuoteDetail(dataVehicle);
@@ -439,6 +448,9 @@ exports.CreateQuote = async (req, res) => {
                 createQuoteLogBackOffice(dataQuolog);
                 updateCoverageDetail(PremiumDetails, QuotationID,
                     req.body.sum_insured_1, req.body.discount_pct);
+
+                if (dataQuotes.Status == "0")
+                    SendMail(DataSendMail);
 
 
                 res.status(200).send({
@@ -489,10 +501,8 @@ exports.CreateQuote = async (req, res) => {
                     };
 
                     createQuoteLogBackOffice(dataQuolog);
-
-                    SendMail(DataSendMail);
-
-
+                    if (dataQuotes.Status == "0")
+                        SendMail(DataSendMail);
 
                     createCoverageDetail(PremiumDetails, results.QuotationID,
                         req.body.sum_insured_1, req.body.discount_pct);
