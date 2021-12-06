@@ -30,6 +30,8 @@ module.exports = app => {
 
 
     router.post("/sendmail", backoffice.sendmailtest);
+
+    router.get("/agent", motor.getSummaryAgent);
     
 
     //Prefix

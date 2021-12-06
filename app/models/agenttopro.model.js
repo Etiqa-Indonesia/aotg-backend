@@ -10,6 +10,12 @@ module.exports = (sequelize, Sequelize) => {
         },
         Description: {
             type: Sequelize.STRING(50)
+        },
+        ToproYearLimit: {
+            type: Sequelize.STRING(1)
+        },
+        OrderNo: {
+            type: Sequelize.INTEGER
         }
 
     });

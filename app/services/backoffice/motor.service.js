@@ -1,4 +1,5 @@
 const db = require("../../models");
+const { QueryTypes } = require('sequelize')
 const Quote = db.Quotation;
 const Op = db.Sequelize.Op;
 const Agent = db.Agent;
@@ -45,7 +46,7 @@ module.exports = {
             });
 
     },
-    getMotorQuote: async (data, Role, page,CustomerName, callback) => {
+    getMotorQuote: async (data, Role, page, CustomerName, callback) => {
         let where = {}
         where.Status = data.Status
         where.TOC = data.TOC
@@ -56,11 +57,11 @@ module.exports = {
                 include: [
                     {
 
-                        model: Customer ,
-                        attributes: { exclude: [ 'CreateDate', 'UpdateDate'] },
+                        model: Customer,
+                        attributes: { exclude: ['CreateDate', 'UpdateDate'] },
                         where: {
-                            CustomerName : { [Op.like]: `%${CustomerName}%` }
-                           }
+                            CustomerName: { [Op.like]: `%${CustomerName}%` }
+                        }
 
                     }
                 ],
@@ -70,7 +71,7 @@ module.exports = {
                 attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI'],
                 order: [
                     ['QuotationID', 'DESC']
-                  ]
+                ]
 
             })
             .then((data) => {
@@ -88,5 +89,41 @@ module.exports = {
                 console.log(error)
                 return callback(error);
             });
+    },
+
+    getSummaryAgent: async (data) => {
+        return await db.sequelize.query(`SELECT 
+        A.QuotationID, 
+        DATE_FORMAT(A.CreateDate, "%d %M %Y") AS TanngalBuat, 
+        B.Name, 
+        B.Email,
+        A.PolicyNo,
+        A.MainSI AS Sum_Insured, 
+        A.Premium, 
+        A.DiscPCT AS Diskon, 
+        A.DiscAmount NilaiDiskon, 
+        A.StampDuty, 
+        '25000' AS AdminFee, 
+        A.PolicyCost, 
+        C.Model, 
+        C.Brand, 
+        GROUP_CONCAT(E.RateDesc, ' ', D.SumInsured) CoverageDesc 
+      FROM 
+        Quotation A 
+        LEFT JOIN Agent B ON A.AgentID = B.AgentID 
+        LEFT JOIN QuoDetailMV C ON A.QuotationID = C.QuotationID 
+        LEFT JOIN Coverage D ON A.QuotationID = D.QuotationID 
+        LEFT JOIN RateTab E ON D.RateCode = E.RateCode 
+      WHERE 
+        A.Status = "D" 
+        AND B.AgentID NOT IN (12, 25) -- AND A.PolicyNo='1010020121025481'
+      GROUP BY 
+        A.QuotationID 
+      ORDER BY 
+        A.QuotationID DESC
+        
+      `)
     }
+
+
 }

@@ -1,20 +1,20 @@
-const {getMotorDashboard, getMotorQuote} = require('../../services/backoffice/motor.service')
-const {findAllRateCode} = require('../../services/rate.service')
-const {findAllVehicleType} = require('../../services/vehicletype.service')
-const {motorproductid} = require('../../config/db.config')
+const { getMotorDashboard, getMotorQuote, getSummaryAgent } = require('../../services/backoffice/motor.service')
+const { findAllRateCode } = require('../../services/rate.service')
+const { findAllVehicleType } = require('../../services/vehicletype.service')
+const { motorproductid } = require('../../config/db.config')
 
 exports.getMotorDashboard = async (req, res) => {
-    if (req.params.role =='A') {
+    if (req.params.role == 'A') {
         res.status(400).send({
             message: "Role Anda Bukan Marketing"
         });
-        return ;
+        return;
     }
     const data = {
-        TOC : motorproductid,
-        Role : req.params.role
+        TOC: motorproductid,
+        Role: req.params.role
     }
-    getMotorDashboard(data, (err, results)=>{
+    getMotorDashboard(data, (err, results) => {
         if (err) {
             return res.status(500).send({
                 message: "Error Retrieving Data"
@@ -29,6 +29,12 @@ exports.getMotorDashboard = async (req, res) => {
     });
 };
 
+exports.getSummaryAgent = async (req, res) => {
+    const data = await getSummaryAgent('2')
+    res.status(200).send({
+        data
+    })
+}
 exports.findAllRateCode = async (req, res) => {
     try {
         const RateCode = await findAllRateCode();
@@ -70,24 +76,24 @@ exports.getMotorQuote = async (req, res) => {
         res.status(400).send({
             message: "Status harus diisi"
         });
-        return ;
+        return;
     }
-    if (req.params.role =='A') {
+    if (req.params.role == 'A') {
         res.status(400).send({
             message: "Role Anda Bukan Marketing"
         });
-        return ;
+        return;
     }
     const customerName = (req.query.customerName == undefined ? "" : req.query.customerName)
-    
-    const page = (req.query.page == undefined || req.query.page==0  ? 0 : req.query.page)
+
+    const page = (req.query.page == undefined || req.query.page == 0 ? 0 : req.query.page)
     console.log(page)
     const data = {
-        Status : req.params.status,
-        TOC : motorproductid
+        Status: req.params.status,
+        TOC: motorproductid
     }
     const Role = req.params.role
-    getMotorQuote(data,Role,page,customerName, (err, results)=>{
+    getMotorQuote(data, Role, page, customerName, (err, results) => {
         if (err) {
             return res.status(500).send({
                 message: "Error Retrieving Data",

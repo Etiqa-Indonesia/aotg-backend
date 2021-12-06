@@ -3,8 +3,9 @@ const MwClient = require('../../mw/motor/mw.motor.client')
 const apicache = require('apicache')
 // const cache = apicache.middleware
 const config = require('../../config/mw.config')
+const configdb = require('../../config/db.config')
 const redis = require('redis')
-const { findRateCode, findTopro,findRateCodeMaxSI } = require('../../services/rate.service')
+const { findRateCode, findTopro, findRateCodeMaxSI } = require('../../services/rate.service')
 let redisCache = apicache.options({ redisClient: redis.createClient() }).middleware
 
 router.get('/countries', redisCache(config.cacheDuration), async (req, res, next) => {
@@ -46,8 +47,8 @@ router.get('/vehicles/test', (req, res, next) => {
   res.send('hora')
 })
 
-router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), async (req, res, next) => {
-  
+router.get('/vehicles/:AgentType', redisCache(config.cacheDurationListingNew), async (req, res, next) => {
+
 
   const ToproList = await findTopro(req.params.AgentType);
   const RateCodeMaxSI = await findRateCodeMaxSI(req.params.AgentType);
@@ -56,25 +57,20 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
   let coverageComprCare = null;
   let coverageTLOCare = null;
 
+  //Ambil Topro Komrehensive List Pertama Saja (karena CoverageID sama untuk Semua topro)
   if (ToproList[0].Topro) {
-    coverageComprCare = await MwClient.fetchCoverageDetails('0201',ToproList[0].Topro)
+    coverageComprCare = await MwClient.fetchCoverageDetails(configdb.motorproductid, ToproList[0].Topro)
   }
-  else{
-    coverageComprCare = await MwClient.fetchCoverageDetails('0201','MOTO-COMPR')
-  }
-
+  //Ambil Topro TLO List Pertama Saja (karena CoverageID sama untuk Semua topro)
   if (ToproList[1].Topro) {
-    coverageTLOCare = await MwClient.fetchCoverageDetails('0201',ToproList[1].Topro)
-  }
-  else{
-    coverageTLOCare = await MwClient.fetchCoverageDetails('0201','MOTO-TLO')
+    coverageTLOCare = await MwClient.fetchCoverageDetails(configdb.motorproductid, ToproList[1].Topro)
   }
 
   let [regions, products] = [
     await MwClient.fetchRegions(),
     await MwClient.fetchProducts()
   ]
- 
+
 
   const RateComprFix = [];
   const RateTLOFix = [];
@@ -99,22 +95,27 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
 
   const ToproFix = []
 
-  for (let i = 0; i < ToproList.length; i++) {
-    // if (ToproList[i].Topro == 'MOTO-COMPR') {
-    //   const ToproDesc = ToproList[i].Topro
-    //   ToproFix.push(ToproDesc);
-    // }
-    // if (ToproList[i].Topro == 'MOTO-TLO') {
-    //   const ToproDesc = ToproList[i].Topro
-    //   ToproFix.push(ToproDesc);
-    // }
-
-      // const ToproDesc = ToproList[i].Topro
-      const ToproDesc = {
-        Topro :ToproList[i].Topro,
-        Description : ToproList[i].Description
+  for (let i = 0; i < 2; i++) { //Looping < 2 untuk ambil topro awal dibawah 6 tahun
+    let ToproDesc = [];
+    if (ToproList[i].Description.toLowerCase() === 'tlo') {
+      ToproDesc = {
+        Topro: ToproList[i].Topro,
+        Description: ToproList[i].Description,
+        LimitYear: configdb.limitTLO, //Limit Tahun yg bisa dipilih TLO
+        ToproUsedAtYear : ToproList[i].ToproYearLimit //Limit Tahun untuk membedakan TOPRO yg dipakai
       }
-      ToproFix.push(ToproDesc);
+    }
+    else {
+      ToproDesc = {
+        Topro: ToproList[i].Topro,
+        Description: ToproList[i].Description,
+        LimitYear: configdb.limitCompre, //Limit Tahun yg bisa dipilih Komprehensive
+        ToproUsedAtYear : ToproList[i].ToproYearLimit //Limit Tahun untuk membedakan TOPRO yg dipakai
+      }
+
+    }
+
+    ToproFix.push(ToproDesc);
   }
 
   let lists = {
@@ -123,7 +124,7 @@ router.get('/vehicles/:AgentType',redisCache(config.cacheDurationListingNew), as
     coverages: ToproFix,
     cov_compr: RateComprFix,
     cov_tlo: RateTLOFix,
-    max_si :RateCodeMaxSI
+    max_si: RateCodeMaxSI
   }
   res.send(lists)
 })
@@ -133,7 +134,7 @@ router.get('/listings/1', redisCache(config.cacheDuration), async (req, res, nex
   let [regions, products, coverages, coverage_compr, coverage_tlo, manufacture_years] = [
     await MwClient.fetchRegions(),
     await MwClient.fetchProducts(),
-    await MwClient.fetchCoverages('0201'),
+    await MwClient.fetchCoverages(configdb.motorproductid),
     await MwClient.fetchCoverageDetails('0201', 'MOTO-COMPR'),
     await MwClient.fetchCoverageDetails('0201', 'MOTO-TLO'),
     await MwClient.fetchManufactureYears()
