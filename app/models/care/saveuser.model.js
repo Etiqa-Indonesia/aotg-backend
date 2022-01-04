@@ -24,7 +24,7 @@ const SaveUser = {
     Role: "CLIENT",
     TaxID: null,
     Type: "COMMON",
-    ASource: "EII-POLICY"
+    ASource: "AOTG"
 }
 
 module.exports = SaveUser

@@ -109,7 +109,7 @@ module.exports = {
                         }
                     ],
                     raw: true,
-                    attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI'],
+                    attributes: ['QuotationID', 'CreateDate', 'UpdateDate', 'MainSI','IsPaid'],
                     order: [
                         ['QuotationID', 'DESC']
                       ]

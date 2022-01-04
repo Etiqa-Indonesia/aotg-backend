@@ -49,22 +49,30 @@ const quote_client = {
   },
   saveSysUser (payload) {
     const data = http.post(`${AOTG}/save_sys_user`, payload)
-    // return http.post(`${AOTG}/save_sys_user`, payload)
     return data
   },
   savePolicy (payload) {
     const data = http.post(`${AOTG}/save_policy`, payload)
-    // return http.post(`${AOTG}/save_sys_user`, payload)
     return data
   },
   submitPolicy (payload) {
     const data = http.post(`${AOTG}/submit_policy`, payload)
-    // return http.post(`${AOTG}/save_sys_user`, payload)
     return data
   },
   eFIle (payload) {
     const data = http.post(`${AOTG}/efile`, payload)
-    // return http.post(`${AOTG}/save_sys_user`, payload)
+    return data
+  },
+  GetAno (payload) {
+    const data = http.post(`${AOTG}/searh_policy_stored`, payload)
+    return data
+  },
+  GetPolicyDetail (payload) {
+    const data = http.post(`${AOTG}/search_policy_detail_stored`, payload)
+    return data
+  },
+  UploadARBucket (payload) {
+    const data = http.post(`${AOTG}/upload_ar_bucket`, payload)
     return data
   }
   // testget (payload) {

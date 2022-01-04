@@ -7,6 +7,10 @@ const path = require("path");
 const { ok } = require("assert");
 const ua = require('universal-analytics');
 const gaTrackingId = 'UA-186333861-1'
+const dbConfig = require('../config/db.config')
+const { findToproBasedOnYear } = require("../services/rate.service");
+const midtransClient = require('midtrans-client');
+
 
 const DataLog = {
     QuotationID: null,
@@ -16,6 +20,35 @@ const DataLog = {
     StatusCode: null,
     Response: null
 };
+
+const InvoiceMidtrans = async (data, res) => {
+    let snap = new midtransClient.Snap({
+        serverKey: dbConfig.server_key,
+        clientKey: dbConfig.client_key
+    });
+
+    let parameter = {
+        "transaction_details": {
+            "order_id": "test-transaction-123",
+            "gross_amount": 200000
+        }, "credit_card": {
+            "secure": true
+        }
+    };
+
+    const redirectURL = await snap.createTransaction(parameter)
+    return redirectURL
+}
+
+const EIICareUser = (dataname, datano) => {
+    var EIIID = 'AOTG-' + datano
+    return EIIID
+}
+
+const EIICareUserOld = (dataname, datano) => {
+    var EIIID = 'AOTG-'+dataname +'-' + datano
+    return EIIID
+}
 
 const formatDate = (date) => {
     var d = new Date(date),
@@ -55,6 +88,37 @@ const PasswordPolicy = (text) => {
     return isAllowed
 }
 
+const GenerateOrderID = (ProductID, QuotationID) => {
+    let ReferenceYear = 2000
+    let year = new Date().getFullYear() - ReferenceYear
+
+    const OrderID = year + ProductID + '-AOTG' + '-' + QuotationID + '-' +generateToday()
+
+    return OrderID
+}
+
+const generateToday = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = mm + dd + yyyy;
+
+    return today
+}
+
+const FindToproUsed = async (TypeVehicle, AgentType, Description) => {
+
+    if (dbConfig.truckType.indexOf(TypeVehicle.toLowerCase()) !== -1) {
+        console.log('Masuk Tronton')
+        return await findToproBasedOnYear(AgentType, dbConfig.TypeOfToproUsed[2], Description)
+    }
+    else {
+        return await findToproBasedOnYear(AgentType, dbConfig.TypeOfToproUsed[1], Description)
+
+    }
+}
 var transporter = nodemailer.createTransport({
     host: config.mailHost,
     port: config.mailPort,
@@ -152,5 +216,10 @@ module.exports = {
     PasswordPolicy: PasswordPolicy,
     numberWithCommas: numberWithCommas,
     sendMail: sendMail,
-    TrackEvent: TrackEvent
+    TrackEvent: TrackEvent,
+    FindToproUsed: FindToproUsed,
+    InvoiceMidtrans: InvoiceMidtrans,
+    EIICareUser: EIICareUser,
+    GenerateOrderID: GenerateOrderID,
+    EIICareUserOld: EIICareUserOld
 }

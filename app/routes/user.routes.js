@@ -25,6 +25,8 @@ module.exports = app => {
 
     router.get("/encrypt/:text",checktoken,  user.encrypt);
     router.get("/decrypt/:text",checktoken,  user.decrypt);
+
+    router.get("/paymenturl/invoice",  checktoken, user.InvoiceMidtrans);
     // router.post("/test",  testSendMail);
 
     //Prefix

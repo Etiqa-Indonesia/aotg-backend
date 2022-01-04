@@ -18,7 +18,7 @@ const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const { decrypt, encrypt } = require('../auth/encrypt')
 const { createLogBO } = require('../services/userlog.service')
-const {TrackEvent} =require('../services/global.service')
+const { TrackEvent, InvoiceMidtrans } = require('../services/global.service')
 
 var transporter = nodemailer.createTransport({
     host: config.mailHost,
@@ -289,6 +289,16 @@ exports.encrypt = (req, res) => {
     res.status(200).send({
         data: Encrypted
     })
+};
+
+exports.InvoiceMidtrans = async (req, res) => {
+
+
+    const redirectURL = await InvoiceMidtrans()
+    console.log(redirectURL)
+    res.status(200).send({
+        data: redirectURL.redirect_url
+    });
 };
 
 exports.decrypt = (req, res) => {

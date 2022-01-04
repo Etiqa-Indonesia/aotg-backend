@@ -121,6 +121,10 @@ module.exports = (sequelize, Sequelize) => {
         Remarks: {
             allowNull: true,
             type: Sequelize.STRING(250)
+        },
+        IsPaid: {
+            allowNull: true,
+            type: Sequelize.TINYINT
         }
 
     });

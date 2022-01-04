@@ -5,6 +5,7 @@ const QuoteLog = db.QuotationLog;
 const QuoteDetailMV = db.QuotationMV;
 const Customer = db.Customer;
 const Coverage = db.Coverage;
+const Invoices = db.Invoices;
 const motorout = require('../models/response/QuoteMotor.model')
 const SaveUser = require('../models/care/saveuser.model')
 const SavePolicy = require('../models/care/savepolicy.model')
@@ -17,13 +18,13 @@ const path = require('path');
 const { numberWithCommas } = require('./global.service');
 const { info } = require("console");
 const DIRDRAFTQUOT = path.join(__dirname, '../../quotationdraft/');
-const {SendMailDraftQuptation} = require('../services/backoffice/mail.quotation.service')
+const { SendMailDraftQuptation } = require('../services/backoffice/mail.quotation.service')
 const DirHTMLMailCreateQuote = path.join(__dirname, '../mail/calculatequotation.html');
 
 var html = fs.readFileSync(DirHTMLMailCreateQuote, "utf8")
 var options = {
     format: "A3",
-    orientation: "landscape",
+    orientation: "portrait",
     border: "10mm",
     // header: {
     //     "height": "30mm",
@@ -47,7 +48,7 @@ const formatDate = (date) => {
 }
 
 const EIICareUser = (dataname, datano) => {
-    var EIIID = 'AOTG-' + dataname + '-' + datano
+    var EIIID = 'AOTG-' + datano
     return EIIID
 }
 
@@ -60,7 +61,20 @@ const ReffNo = (dataquot) => {
 }
 
 module.exports = {
+
+    updateDynamicQuotation: async (QuotationID,data) => {
+        console.log(data)
+        await Quote.update({
+            IsPaid: data.IsPaid,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: QuotationID
+            }
+        });
+    },
     createDraftQuotation: async (data, id) => {
+
         var Jaminan_Dasar = null;
         var Nilai_TOC = null;
         var Coverages = [];
@@ -105,12 +119,12 @@ module.exports = {
 
         }
         try {
-            var outputpdf ='MotorVehicle_'+ id + '_' + data.customer_detail.name + '.pdf'
-            
+            var outputpdf = 'MotorVehicle_' + id + '_' + data.customer_detail.name + '.pdf'
+
             var document = {
                 html: html,
                 data: {
-                    Name : data.customer_detail.name,
+                    Name: data.customer_detail.name,
                     quote: id,
                     Jaminan_Dasar: Jaminan_Dasar,
                     Discount: data.discount_pct,
@@ -143,7 +157,8 @@ module.exports = {
         }
 
         try {
-          await pdf.create(document, options)
+            await pdf.create(document, options)
+
 
         } catch (error) {
             console.log(error)
@@ -153,6 +168,7 @@ module.exports = {
             outputpdf: outputpdf,
             dir: DIRDRAFTQUOT + '/' + outputpdf
         };
+        console.log(Info)
 
         return Info
 
@@ -164,6 +180,29 @@ module.exports = {
             RefferenceNumber: data.RefferenceNumber,
             PolicyNo: data.PolicyNo,
             Status: configdb.statusApprove,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: id
+            }
+        });
+    },
+    updateQuotationforANO: async (id, data) => {
+        // console.log(id,data);
+        await Quote.update({
+            ANO: data.ANO,
+            MailFetchTries: data.MailFetchTries,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: id
+            }
+        });
+    },
+    updateQuotationforPayment: async (id, data) => {
+        // console.log(id,data);
+        await Quote.update({
+            IsPaid: data.IsPaid,
             UpdateDate: Date.now()
         }, {
             where: {
@@ -230,17 +269,22 @@ module.exports = {
     },
     updateQuotation: async (id, data, callback) => {
         await Quote.update({
+            TOC: data.TOC,
+            Topro: data.Topro,
             Region: data.Region,
             StartDate: data.StartDate,
             EndDate: data.EndDate,
             MainSI: data.MainSI,
-            Premium: data.Premium,
+            SI_2: data.SI_2,
+            SI_3: data.SI_3,
+            SI_4: data.SI_4,
+            SI_5: data.SI_5,
+            Premium: data.Premium, //Total Premium
             DiscPCT: data.DiscPCT,
-            DiscAmount: data.DiscAmount,
+            DiscAmount: data.DiscAmount, //Total discount
             PolicyCost: data.PolicyCost,
             StampDuty: data.StampDuty,
             Status: data.Status,
-            Remarks: data.Remarks,
             UpdateDate: Date.now()
 
         }, {
@@ -297,6 +341,7 @@ module.exports = {
                             const coverage = data[i]['Coverages.RateCode']
                             coverageDetails.push(coverage);
                         }
+
 
                         SaveUser.ID = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
 
@@ -681,7 +726,11 @@ module.exports = {
                     try {
                         Customer.update({
                             UpdateDate: Date.now(),
-                            Email : datasend.Email
+                            Email: datasend.Email,
+                            Address: datasend.Address,
+                            Gender: datasend.Gender,
+                            BirthDate: datasend.BirthDate,
+                            PhoneNo: datasend.PhoneNo
                         }, {
                             where: {
                                 CustomerID: data[0].CustomerID
@@ -697,8 +746,6 @@ module.exports = {
 
                 }
                 else {
-                    console.log('Masuk Insert')
-                    console.log(datasend)
                     Customer.create(datasend)
                         .then((res) => {
                             if (res != null) {
@@ -810,7 +857,7 @@ module.exports = {
         }
         try {
             var outputpdf = id + '_' + data.customer_detail.name + '.pdf'
-            
+
             var document = {
                 html: html,
                 data: {
@@ -846,7 +893,8 @@ module.exports = {
         }
 
         try {
-          await pdf.create(document, options)
+            const a = await pdf.create(document, options)
+            console.log("Sukses Create " + a)
 
         } catch (error) {
             console.log(error)

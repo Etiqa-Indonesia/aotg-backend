@@ -58,13 +58,12 @@ const SaveCareLog = (ResponseCareUser, StatusCode, ID, ParamSend, Config) => {
 
 module.exports = {
     SendMail: async (data) => {
-        console.log(data);
+        console.log('Masuk Mail Marketing')
 
         if (data.Email[0]) {
             readHTMLFile(data.Pathfile, function (err, html) {
                 var template = handlebars.compile(html);
                 var replacements = {
-                    Name: data.Name,
                     LinkBackOffice: config.linkBackOffice,
                     QuotationID: data.QuotationID
                 };
@@ -76,10 +75,12 @@ module.exports = {
                     html: htmlToSend
                 };
                 const MailInfo = 'Email sent to Marketing: ' + data.Email + ', untuk Informasi CreateQuote';
+                console.log(mailOptions)
 
                 transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {
-                        SaveCareLog(error, '400', data.QuotationID, data.QuotationID, 'SendEmail');
+                        console.log(error);
+                        //SaveCareLog(error, '400', data.QuotationID, data.QuotationID, 'SendEmail');
                     } else {
                         SaveCareLog(MailInfo, '200', data.QuotationID, data.QuotationID, 'SendEmail');
                         return (console.log('Email sent '));
@@ -89,7 +90,6 @@ module.exports = {
             });
         }
         else {
-            console.log('Gagal')
             SaveCareLog('Failed Send Mail : Data Email Marketing tidak tersedia', '400', data.QuotationID, data.QuotationID, 'SendEmail');
         }
 

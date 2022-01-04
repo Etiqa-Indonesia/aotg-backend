@@ -36,5 +36,14 @@ module.exports = {
         }).catch((error) => {
             return callback(error);
         });
+    },
+    RetrieveANO: async (data) => {
+        await mw.GetAno(data)
+        .then((data) => {
+            return callback(null, data)
+
+        }).catch((error) => {
+            return callback(error);
+        });
     }
 }

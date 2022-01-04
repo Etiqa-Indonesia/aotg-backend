@@ -11,7 +11,22 @@ module.exports = {
         return await AgentTopro.findAll(
             {
                 where: { AgentCatID: data},
-                raw :true
+                raw :true,
+                order: [
+                    ['OrderNo', 'ASC']
+                  ]
+            }
+        )
+    },
+    findToproBasedOnYear : async(AgentCatID,Vehicleyear, Description) =>{
+        return await AgentTopro.findOne(
+            {
+                where: { 
+                    AgentCatID: AgentCatID,
+                    ToproYearLimit : Vehicleyear,
+                    Description : Description
+                },
+                attributes: ['Topro']
             }
         )
     },

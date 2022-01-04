@@ -27,9 +27,12 @@ module.exports = app => {
     router.get("/vehicletype",validatetoken, motor.findAllVehicleType);
     router.get("/findagentdependencies/agentcategory/:agentcat",validatetoken, agentcat.findAllDependenciesAgentCategory);
     router.post("/submitagentdependencies",validatetoken, agentcat.submitAgentDependencies);
+    
 
 
     router.post("/sendmail", backoffice.sendmailtest);
+
+    // router.get("/agent", motor.getSummaryAgent);
     
 
     //Prefix
