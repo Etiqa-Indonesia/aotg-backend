@@ -10,7 +10,7 @@ const config = {
     //baseUrl: 'http://192.168.112.88:8353',
     //baseUrl: 'http://MWHOST:8353',
     //baseUrl: 'http://localhost:8353',
-    /*
+    /*/
     local Axios timeout (in ms)
     */
     clientTimeout: 20000,
