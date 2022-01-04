@@ -1,7 +1,7 @@
 const db = require("../models");
 const Quote = db.Quotation;
 const Op = db.Sequelize.Op;
-const { createCoverageDetail, createQuote, createQuoteLogBackOffice,
+const { createCoverageDetail, createQuote, createQuoteLogBackOffice, 
     createQuoteLog, createQuoteDetail, checkExistCustomer, createCustomer, updateCustomer,
     updateFrontView, updateBackView, updateLeftView, updateRightView,
     createorupdateCustomer, updateCustomerQuotation,
@@ -16,6 +16,7 @@ const { findMarketingEmailByAgentID } = require('../services/agenthandler.servic
 const { findPlateCode } = require('../services/platecode.service');
 const { sendMail, FindToproUsed } = require('../services/global.service')
 const { findAgentType } = require('../services/agent.service')
+
 const multer = require('multer');
 const path = require("path");
 const fs = require('fs');
@@ -274,7 +275,6 @@ exports.findToproBasedOnYear = async (req, res) => {
 };
 
 
-
 exports.CreateQuote = async (req, res) => {
     var d = new Date(req.body.inception_date);
     var EndDate = d.setFullYear(d.getFullYear() + 1);
@@ -475,6 +475,7 @@ exports.CreateQuote = async (req, res) => {
                 dataVehicle.QuotationID = QuotationID;
                 DataLog.QuotationID = QuotationID;
                 DataLog.Response = JSON.stringify(DataUpdate);
+                DataSendMail.QuotationID = QuotationID;
                 // console.log(DataLog)
 
                 createResponseLog(DataLog);
@@ -485,6 +486,7 @@ exports.CreateQuote = async (req, res) => {
                     Status: dataQuotes.Status,
                     UserID: req.body.userid
                 };
+                
 
                 createQuoteLogBackOffice(dataQuolog);
                 updateCoverageDetail(PremiumDetails, QuotationID,

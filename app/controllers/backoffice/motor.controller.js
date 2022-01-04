@@ -1,4 +1,4 @@
-const { getMotorDashboard, getMotorQuote, getSummaryAgent } = require('../../services/backoffice/motor.service')
+const { getMotorDashboard, getMotorQuote, getSummaryAgentList, getSummaryAgentDetail } = require('../../services/backoffice/motor.service')
 const { findAllRateCode } = require('../../services/rate.service')
 const { findAllVehicleType } = require('../../services/vehicletype.service')
 const { motorproductid } = require('../../config/db.config')
@@ -29,11 +29,41 @@ exports.getMotorDashboard = async (req, res) => {
     });
 };
 
-exports.getSummaryAgent = async (req, res) => {
-    const data = await getSummaryAgent('2')
-    res.status(200).send({
-        data
-    })
+exports.getSummaryAgentList = async (req, res) => {
+    const page = (req.query.page == undefined || req.query.page == 0 ? 0 : req.query.page)
+    try {
+        const data = await getSummaryAgentList(req.body, page)
+        res.status(200).send({
+            'code': '200',
+            'message': 'Success',
+            'data': data
+        })
+    } catch (error) {
+        res.status(200).send({
+            'code': '400',
+            'message': 'Error',
+            'data': error
+        })
+    }
+    
+}
+
+exports.getSummaryAgentDetail = async (req, res) => {
+    try {
+        const data = await getSummaryAgentDetail(req.params.id)
+        res.status(200).send({
+            'code': '200',
+            'message': 'Success',
+            'data': data
+        })
+    } catch (error) {
+        res.status(200).send({
+            'code': '400',
+            'message': 'Error',
+            'data': error
+        })
+    }
+    
 }
 exports.findAllRateCode = async (req, res) => {
     try {

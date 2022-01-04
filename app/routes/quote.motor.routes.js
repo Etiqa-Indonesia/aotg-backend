@@ -22,7 +22,7 @@ module.exports = app => {
     router.get("/quote/leftimage/:id",checktoken, quote.getImageLeftViewBase64);
     router.get("/quote/rightimage/:id",checktoken, quote.getImageRightViewBase64);
     router.get("/quote/insideimage/:id",checktoken, quote.getImageInsideViewBase64);
-
+    
     router.get("/findtopro/agentid/:agentid/vehicleyear/:vehicleyear",checktoken, quote.findToproBasedOnYear);
 
     router.get("/platecodeinfo/:pcode",checktoken, quote.findPlateCode);

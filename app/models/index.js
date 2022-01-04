@@ -60,5 +60,6 @@ db.PlateCode = require("./platecode.model")(sequelize, Sequelize);
 
 db.VehicleType = require("./vehicletype.model")(sequelize, Sequelize);
 db.VTAllowed = require("./vtallowed.model")(sequelize, Sequelize);
+db.Invoices = require("./invoices.model")(sequelize, Sequelize);
 
 module.exports = db;

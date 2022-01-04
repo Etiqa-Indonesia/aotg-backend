@@ -5,6 +5,7 @@ const QuoteLog = db.QuotationLog;
 const QuoteDetailMV = db.QuotationMV;
 const Customer = db.Customer;
 const Coverage = db.Coverage;
+const Invoices = db.Invoices;
 const motorout = require('../models/response/QuoteMotor.model')
 const SaveUser = require('../models/care/saveuser.model')
 const SavePolicy = require('../models/care/savepolicy.model')
@@ -23,7 +24,7 @@ const DirHTMLMailCreateQuote = path.join(__dirname, '../mail/calculatequotation.
 var html = fs.readFileSync(DirHTMLMailCreateQuote, "utf8")
 var options = {
     format: "A3",
-    orientation: "landscape",
+    orientation: "portrait",
     border: "10mm",
     // header: {
     //     "height": "30mm",
@@ -60,6 +61,18 @@ const ReffNo = (dataquot) => {
 }
 
 module.exports = {
+
+    updateDynamicQuotation: async (QuotationID,data) => {
+        console.log(data)
+        await Quote.update({
+            IsPaid: data.IsPaid,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: QuotationID
+            }
+        });
+    },
     createDraftQuotation: async (data, id) => {
 
         var Jaminan_Dasar = null;
@@ -167,6 +180,29 @@ module.exports = {
             RefferenceNumber: data.RefferenceNumber,
             PolicyNo: data.PolicyNo,
             Status: configdb.statusApprove,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: id
+            }
+        });
+    },
+    updateQuotationforANO: async (id, data) => {
+        // console.log(id,data);
+        await Quote.update({
+            ANO: data.ANO,
+            MailFetchTries: data.MailFetchTries,
+            UpdateDate: Date.now()
+        }, {
+            where: {
+                QuotationID: id
+            }
+        });
+    },
+    updateQuotationforPayment: async (id, data) => {
+        // console.log(id,data);
+        await Quote.update({
+            IsPaid: data.IsPaid,
             UpdateDate: Date.now()
         }, {
             where: {
@@ -305,7 +341,7 @@ module.exports = {
                             const coverage = data[i]['Coverages.RateCode']
                             coverageDetails.push(coverage);
                         }
-                        
+
 
                         SaveUser.ID = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
 
@@ -710,8 +746,6 @@ module.exports = {
 
                 }
                 else {
-                    console.log('Masuk Insert')
-                    console.log(datasend)
                     Customer.create(datasend)
                         .then((res) => {
                             if (res != null) {

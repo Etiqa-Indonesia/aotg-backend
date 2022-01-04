@@ -61,13 +61,25 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to REST API." });
 });
 
-cron.schedule('* * * * * ', () => {
-    require("./app/services/cron.service")(app);
-});
+// cron.schedule('* * * * * ', () => {
+//     require("./app/services/cron.service")(app);
+// });
 
-cron.schedule('* * * * *', () => {
-    require("./app/services/mail.service")(app);
-});
+// cron.schedule('* * * * *', () => {
+//     require("./app/services/mail.service")(app);
+// });
+
+// cron.schedule('* * * * *', () => {
+//     require("./app/services/ano_cron.service")(app);
+// });
+
+// cron.schedule('* * * * *', () => {
+//     require("./app/services/policydetail.service")(app);
+// });
+
+// cron.schedule('* * * * *', () => {
+//     require("./app/services/upload_ar_bucket_cron.service")(app);
+// });
 
 // User Routes
 require("./app/routes/user.routes")(app);
@@ -75,8 +87,11 @@ require("./app/routes/mw.motor.routes")(app);
 require("./app/routes/quote.motor.routes")(app);
 require("./app/routes/dashboard.routes")(app);
 require("./app/routes/customer.routes")(app);
+require("./app/routes/payment.route")(app);
 require("./app/routes/backoffice/userbackoffice.routes")(app);
 require("./app/routes/backoffice/motorbackoffice.routes")(app);
+require("./app/routes/backoffice/paymentBO.route")(app);
+
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;

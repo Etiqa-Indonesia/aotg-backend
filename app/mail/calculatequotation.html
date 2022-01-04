@@ -1,297 +1,817 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <style>
-        .arialBlack {
-            font-family: Arial, Helvetica, sans-serif;
-            font-weight: bold;
-        }
-    </style>
-  </head>
-  <body>
-    <table style="width: 100%;" border="0">
-        <tbody>
-            <tr>
-                <td>&nbsp;<img
-                        src="data:image/png;base64,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"
-                        style="width: 150px;"></td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>
-                    <strong> <span style="color: #ffbf00; font-family: 'Arial, Helvetica, sans-serif'; font-size: large;">Quotation
-                            Slip</span></strong> 
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>
-                    <span style="font-family: 'Arial, Helvetica, sans-serif'; font-size: large;"> <strong>Asuransi Kendaraan
-                        Bermotor</strong> </span>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>
-                    <span style="font-family: 'Arial, Helvetica, sans-serif'; font-size: small;"> <strong>Quotation No :
-                        {{quote}}</strong> </span>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td><strong><span style="font-family: 'Arial, Helvetica, sans-serif'; font-size: medium;">A. Informasi Umum</span></strong>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>
-                    <table style="width: 80%; height: 170px;" border="0" cellspacing="10">
-                        <tbody>
-                            <tr>
-                                <td style="padding-left: 30px; width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Nama Customer</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{ Name }}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px; width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Jaminan
-                                        Dasar</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Jaminan_Dasar }}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px; width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Promo
-                                        Diskon</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Discount}}%</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Tahun
-                                        Pembuatan</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:&nbsp;{{Tahun_Pembuatan}}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Periode
-                                        Asuransi</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: {{Start}}
-                                        sampai {{End}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: left; padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Perluasan</span>
-                                </td>
-                                <td style="text-align: left; width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;"> {{#each
-                                        Coverages }} &nbsp;{{CoverageDetail}} {{TSI}} <br /> {{/each}}</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;<strong><span style="font-family: Arial, Helvetica, sans-serif; font-size: large;">B. Detail
-                        Kendaraan</span></strong></td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;
-                    <table style="width: 80%; height: 170px;" border="0" cellspacing="10">
-                        <tbody>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Nomor Plat
-                                        Kendaraan</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Plat}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Lokasi</span>
-                                </td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Lokasi}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Wilayah</span>
-                                </td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Wilayah}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Tahun
-                                        Pembuatan</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Tahun_Pembuatan}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Merek</span>
-                                </td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Merek}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Model</span>
-                                </td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Model}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Type</span>
-                                </td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Type}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Nomor
-                                        Rangka</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Rangka}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Nomor
-                                        Mesin</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">:
-                                        {{Nomor_Mesin}}</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;<strong> <span style="font-size: large; font-family: Arial, Helvetica, sans-serif;">C. Rincian Biaya</span></strong>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;
-                    <table style="width: 80%;" border="0" cellspacing="10">
-                        <tbody>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Nilai
-                                        Pertanggungan</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: Rp
-                                        {{Nilai_Pertanggungan}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">{{Jaminan_Dasar}}</span>
-                                </td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: Rp
-                                        {{Nilai_TOC}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Perluasan&nbsp;</span>
-                                </td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">{{#each
-                                        Coverages }} &nbsp; Rp {{CoveragesValue}} - {{CoverageDetailPrintBottom}} <br />
-                                        {{/each}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Total Gross
-                                        Premi</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: Rp
-                                        {{Total}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Biaya
-                                        Polis</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: Rp
-                                        {{Biaya}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Biaya
-                                        Materai</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: Rp
-                                        {{Materai}}</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px;width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Promo Diskon
-                                        {{Discount}} %</span></td>
-                                <td style="width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: Rp -
-                                        {{TotalDiscount}}</span></td>
-                            </tr>
-                            <tr>
-                                <td><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">&nbsp;</span>
-                                </td>
-                                <td>
-                                    <hr />
-                                    <hr />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding-left: 30px; width: 50%;"><span
-                                        style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">Grand
-                                        Total</span></td>
-                                <td style="width: 50%;">
-                                    <p><span style="font-family: Arial, Helvetica, sans-serif; font-size: medium;">: Rp
-                                            {{GrandTotal}}</span></p>
-                                    <hr />
-                                    <p>&nbsp;</p>
-                                </td>
-                            </tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<!--[if gte mso 9]>
+<xml>
+  <o:OfficeDocumentSettings>
+    <o:AllowPNG/>
+    <o:PixelsPerInch>96</o:PixelsPerInch>
+  </o:OfficeDocumentSettings>
+</xml>
+<![endif]-->
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <!--[if !mso]><!--><meta http-equiv="X-UA-Compatible" content="IE=edge"><!--<![endif]-->
+  <title></title>
+  
+    <style type="text/css">
+      table, td { color: #000000; } @media only screen and (min-width: 520px) {
+  .u-row {
+    width: 500px !important;
+  }
+  .u-row .u-col {
+    vertical-align: top;
+  }
+
+  .u-row .u-col-25 {
+    width: 125px !important;
+  }
+
+  .u-row .u-col-100 {
+    width: 500px !important;
+  }
+
+}
+
+@media (max-width: 520px) {
+  .u-row-container {
+    max-width: 100% !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+  .u-row .u-col {
+    min-width: 320px !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+  .u-row {
+    width: calc(100% - 40px) !important;
+  }
+  .u-col {
+    width: 100% !important;
+  }
+  .u-col > div {
+    margin: 0 auto;
+  }
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+
+table,
+tr,
+td {
+  vertical-align: top;
+  border-collapse: collapse;
+}
+
+p {
+  margin: 0;
+}
+
+.ie-container table,
+.mso-container table {
+  table-layout: fixed;
+}
+
+* {
+  line-height: inherit;
+}
+
+a[x-apple-data-detectors='true'] {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+</style>
+  
+  
+
+</head>
+
+<body class="clean-body u_body" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;background-color: #e7e7e7;color: #000000">
+  <!--[if IE]><div class="ie-container"><![endif]-->
+  <!--[if mso]><div class="mso-container"><![endif]-->
+  <table style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;min-width: 320px;Margin: 0 auto;background-color: #e7e7e7;width:100%" cellpadding="0" cellspacing="0">
+  <tbody>
+  <tr style="vertical-align: top">
+    <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top">
+    <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color: #e7e7e7;"><![endif]-->
     
-                        </tbody>
-                    </table>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-        </tbody>
-    </table>
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td style="padding-right: 0px;padding-left: 0px;" align="center">
+      
+      <img align="center" border="0" src="data:image/png;base64,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" alt="" title="" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 300px;" width="300"/>
+      
+    </td>
+  </tr>
+</table>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="498" style="width: 498px;padding: 0px;border-top: 1px solid #000000;border-left: 1px solid #000000;border-right: 1px solid #000000;border-bottom: 1px solid #000000;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 1px solid #000000;border-left: 1px solid #000000;border-right: 1px solid #000000;border-bottom: 1px solid #000000;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%; text-align: left;"><span style="font-size: 16px; line-height: 22.4px;"><strong><span style="color: #ffbf00; line-height: 22.4px; font-size: 16px;">Quotation Slip</span></strong></span></p>
+<p style="font-size: 14px; line-height: 140%; text-align: left;"><span style="font-size: 16px; line-height: 22.4px; color: #000000;"><strong><span style="line-height: 22.4px; font-size: 16px;">Asuransi Kendaraan Bermotor</span></strong></span></p>
+<p style="font-size: 14px; line-height: 140%; text-align: left;"><span style="font-size: 14px; line-height: 19.6px;"><strong><span style="line-height: 19.6px; color: #000000; font-size: 14px;"><span style="line-height: 19.6px; font-size: 14px;">Quotation No : {{quote}}</span></span></strong></span></p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>A. Informasi Umum</strong></span></p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Nama Customer : {{Name}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p dir="ltr" style="font-size: 14px; line-height: 140%;">Jaminan Dasar : {{Jaminan_Dasar}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Promo Diskon : {{Discount}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Tahun Pembuatan : {{Tahun_Pembuatan}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Periode Asuransi : {{Start}}&nbsp;sampai {{End}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Perluasan
+        :&nbsp;<br />{{#each
+        Coverages }} &nbsp;- {{CoverageDetail}} {{TSI}}
+        <br /> {{/each}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>B. Detail Kendaraan</strong></span></p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Nomor Plat Kendaraan : {{Plat}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Lokasi : {{Lokasi}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Wilayah : {{Wilayah}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Tahun Pembuatan : {{Tahun_Pembuatan}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Merek : {{Merek}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Model : {{Model}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Type: {{Type}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Nomor Rangka : {{Rangka}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Nomor Mesin : {{Nomor_Mesin}}</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>C. Rincian Biaya </strong></span></p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Rp {{Nilai_Pertanggungan}} =&gt; Nilai Pertanggungan</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Rp {{Nilai_TOC}} =&gt; {{Jaminan_Dasar}} </p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">
+        {{#each
+        Coverages }} Rp {{CoveragesValue}} -
+        {{CoverageDetailPrintBottom}} <br />
+        {{/each}}
+    </p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Rp {{Total}} =&gt;Total Gross Premi </p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Rp {{Biaya}} =&gt; Biaya Polis&nbsp; </p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Rp {{Materai}} =&gt; Biaya Materai</p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Rp {{TotalDiscount}}&nbsp; =&gt; Promo Diskon {{Discount}} %&nbsp; </p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <table height="0px" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;border-top: 2px solid #000000;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+    <tbody>
+      <tr style="vertical-align: top">
+        <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top;font-size: 0px;line-height: 0px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+          <span>&#160;</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="500" style="width: 500px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+<table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 30px;font-family:arial,helvetica,sans-serif;" align="left">
+        
+  <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
+    <p style="font-size: 14px; line-height: 140%;">Rp {{GrandTotal}} =&gt; Grand Total </p>
+  </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+
+<div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
+    <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:500px;"><tr style="background-color: transparent;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="125" style="width: 125px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-25" style="max-width: 320px;min-width: 125px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
     <table style="width: 100%;" border="0">
         <tbody>
             <tr>
@@ -314,5 +834,36 @@
             </tr>
         </tbody>
     </table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="125" style="width: 125px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+
+<!--[if (mso)|(IE)]></td><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="125" style="width: 125px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+<div class="u-col u-col-25" style="max-width: 320px;min-width: 125px;display: table-cell;vertical-align: top;">
+  <div style="width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+  <!--[if (!mso)&(!IE)]><!--><div style="padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+  
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+</div>
+
+
+    <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+    </td>
+  </tr>
+  </tbody>
+  </table>
+  <!--[if mso]></div><![endif]-->
+  <!--[if IE]></div><![endif]-->
 </body>
+
 </html>

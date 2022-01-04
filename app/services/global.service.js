@@ -22,7 +22,6 @@ const DataLog = {
 };
 
 const InvoiceMidtrans = async (data, res) => {
-    console.log('Masuk')
     let snap = new midtransClient.Snap({
         serverKey: dbConfig.server_key,
         clientKey: dbConfig.client_key
@@ -39,6 +38,16 @@ const InvoiceMidtrans = async (data, res) => {
 
     const redirectURL = await snap.createTransaction(parameter)
     return redirectURL
+}
+
+const EIICareUser = (dataname, datano) => {
+    var EIIID = 'AOTG-' + datano
+    return EIIID
+}
+
+const EIICareUserOld = (dataname, datano) => {
+    var EIIID = 'AOTG-'+dataname +'-' + datano
+    return EIIID
 }
 
 const formatDate = (date) => {
@@ -77,6 +86,26 @@ const PasswordPolicy = (text) => {
     }
 
     return isAllowed
+}
+
+const GenerateOrderID = (ProductID, QuotationID) => {
+    let ReferenceYear = 2000
+    let year = new Date().getFullYear() - ReferenceYear
+
+    const OrderID = year + ProductID + '-AOTG' + '-' + QuotationID + '-' +generateToday()
+
+    return OrderID
+}
+
+const generateToday = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = mm + dd + yyyy;
+
+    return today
 }
 
 const FindToproUsed = async (TypeVehicle, AgentType, Description) => {
@@ -189,5 +218,8 @@ module.exports = {
     sendMail: sendMail,
     TrackEvent: TrackEvent,
     FindToproUsed: FindToproUsed,
-    InvoiceMidtrans: InvoiceMidtrans
+    InvoiceMidtrans: InvoiceMidtrans,
+    EIICareUser: EIICareUser,
+    GenerateOrderID: GenerateOrderID,
+    EIICareUserOld: EIICareUserOld
 }

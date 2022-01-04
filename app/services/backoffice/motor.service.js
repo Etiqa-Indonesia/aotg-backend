@@ -1,9 +1,12 @@
 const db = require("../../models");
-const { QueryTypes } = require('sequelize')
+const { QueryTypes } = require('sequelize');
+const config = require("../../config/mw.config");
+const configdb = require("../../config/db.config");
 const Quote = db.Quotation;
 const Op = db.Sequelize.Op;
 const Agent = db.Agent;
 const Customer = db.Customer;
+const Invoices = db.Invoices;
 
 
 
@@ -91,39 +94,116 @@ module.exports = {
             });
     },
 
-    getSummaryAgent: async (data) => {
-        return await db.sequelize.query(`SELECT 
-        A.QuotationID, 
-        DATE_FORMAT(A.CreateDate, "%d %M %Y") AS TanngalBuat, 
-        B.Name, 
-        B.Email,
-        A.PolicyNo,
-        A.MainSI AS Sum_Insured, 
-        A.Premium, 
-        A.DiscPCT AS Diskon, 
-        A.DiscAmount NilaiDiskon, 
-        A.StampDuty, 
-        '25000' AS AdminFee, 
-        A.PolicyCost, 
-        C.Model, 
-        C.Brand, 
-        GROUP_CONCAT(E.RateDesc, ' ', D.SumInsured) CoverageDesc 
-      FROM 
-        Quotation A 
-        LEFT JOIN Agent B ON A.AgentID = B.AgentID 
-        LEFT JOIN QuoDetailMV C ON A.QuotationID = C.QuotationID 
-        LEFT JOIN Coverage D ON A.QuotationID = D.QuotationID 
-        LEFT JOIN RateTab E ON D.RateCode = E.RateCode 
-      WHERE 
-        A.Status = "D" 
-        AND B.AgentID NOT IN (12, 25) -- AND A.PolicyNo='1010020121025481'
-      GROUP BY 
-        A.QuotationID 
-      ORDER BY 
-        A.QuotationID DESC
+    getSummaryAgentList: async (data, page) => {
+        Quote.belongsTo(Customer, { foreignKey: 'CustomerID' });
+        Quote.hasOne(Invoices, { foreignKey: 'QuotationID' });
         
-      `)
-    }
+        Quote.hasOne(Agent, { foreignKey: 'AgentID', sourceKey: 'AgentID' });
+        let wherequotation = {}
+        let whereinvoices = {}
+        if (data.PolicyNo != null) {
+            wherequotation.PolicyNo = data.PolicyNo
+        }
+        if (data.AgentID != null) {
+            wherequotation.AgentID = data.AgentID
+        }
+        if (data.QuotationID != null) {
+            wherequotation.QuotationID = data.QuotationID
+        }
+        if (data.IsPaid.toLowerCase() !== 'unpaid') {
+            if (data.PaymentTransactionFrom != null && data.PaymentTransactionTo == null) {
+                whereinvoices.PaymentTransactionTime = {
+                    [Op.gte]: data.PaymentTransactionFrom
+                }
+            }
+            if (data.PaymentTransactionFrom == null && data.PaymentTransactionTo != null) {
+                whereinvoices.PaymentTransactionTime = {
+                    [Op.lte]: data.PaymentTransactionTo
+                }
+            }
+            if (data.PaymentTransactionFrom != null && data.PaymentTransactionTo != null) {
+                whereinvoices.PaymentTransactionTime = {
+                    [Op.between]: [data.PaymentTransactionFrom, data.PaymentTransactionTo]
+                }
+            }
+        }
 
+        wherequotation.IsPaid = data.IsPaid.toLowerCase() === 'unpaid' ? 0 : 1
+        wherequotation.TOC = configdb.motorproductid
 
+        console.log(wherequotation)
+        return await Quote.findAll({
+            where: wherequotation,
+            raw: false,
+
+            include: [
+                {
+                    model: Customer,
+                    attributes: ['CustomerName'],
+                    required: false
+                },
+                {
+                    model: Agent,
+                    attributes: ['Name'],
+                    required: false
+                },
+                {
+                    model: Invoices,
+                    attributes: ['Amount', 'PaymentTransactionTime'],
+                    where: whereinvoices,
+                    required: false
+                }
+            ],
+            attributes: ['QuotationID', 'PolicyNo'],
+            order: [
+                ['QuotationID', 'DESC']
+            ],
+
+            limit: 10,
+            offset: page * 10,
+        })
+
+    },
+
+    getSummaryAgentDetail: async (id) => {
+        Quote.belongsTo(Customer, { foreignKey: 'CustomerID' });
+        Quote.hasOne(Invoices, { foreignKey: 'QuotationID' });
+        Invoices.belongsTo(Quote, { foreignKey: 'QuotationID' });
+        Quote.hasOne(Agent, { foreignKey: 'AgentID', sourceKey: 'AgentID' });
+        let wherequotation = {}
+        if (id != null) {
+            wherequotation.QuotationID = id
+        }
+        wherequotation.TOC = configdb.motorproductid
+
+        console.log(wherequotation)
+        return await Quote.findAll({
+            where: wherequotation,
+            raw: false,
+
+            include: [
+                {
+                    model: Customer,
+                    attributes: ['CustomerName']
+                },
+                {
+                    model: Agent,
+                    attributes: ['Name']
+                },
+                {
+                    model: Invoices,
+                    attributes: ['Amount', 'OrderID','Status','Currency','PaymentType','PaymentApprovalCode'],
+                    right: true
+                }
+            ],
+            attributes: ['QuotationID', 'PolicyNo'],
+            order: [
+                ['QuotationID', 'DESC']
+            ]
+        })
+
+    },
 }
+
+    
+
