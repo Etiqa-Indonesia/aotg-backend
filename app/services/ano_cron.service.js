@@ -4,7 +4,7 @@ const Customer = db.Customer;
 const Op = db.Sequelize.Op;
 const MwClient = require('../mw/motor/mw.motor.client')
 const { updateQuotationforANO } = require('../services/quotation.service')
-const { EIICareUser, EIICareUserOld } = require('../services/global.service')
+const { EIICareUser, EIICareUserOld,DateFormatMMDDYY } = require('../services/global.service')
 const { createResponseLog } = require('./responselog.service')
 const dbConfig = require("../config/db.config");
 
@@ -48,7 +48,7 @@ module.exports = app => {
 
                 }
             ],
-            attributes: ['PolicyNo', 'MailFetchTries', 'QuotationID', 'CreateDate'],
+            attributes: ['PolicyNo', 'MailFetchTries', 'QuotationID', 'CreateDate','StartDate'],
             raw: false,
             order: [
                 ['QuotationID', 'DESC']
@@ -61,18 +61,18 @@ module.exports = app => {
 
                 var AID = null
                 if (OldUser > QuoteDate) {
-                    console.log('Masuk Old')
                     AID = EIICareUserOld(data[i].Customer.CustomerName, data[i].Customer.IDNo)
                 }
                 else {
-                    console.log('Masuk New')
                     AID = EIICareUser('', data[i].Customer.IDNo)
                 }
 
                 console.log(AID)
+                console.log(data[i].StartDate.toISOString())
                 const dataGetANO = {
                     ID: AID,
-                    PolicyNo: data[i].PolicyNo
+                    PolicyNo: data[i].PolicyNo,
+                    EffectiveDate : DateFormatMMDDYY(data[i].StartDate.toISOString())
                 };
 
                 let Result = await MwClient.GetAno(dataGetANO)
