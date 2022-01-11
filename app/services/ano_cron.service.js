@@ -1,6 +1,7 @@
 const db = require("../models");
 const Quotation = db.Quotation;
 const Customer = db.Customer;
+const Agent = db.Agent;
 const Op = db.Sequelize.Op;
 const MwClient = require('../mw/motor/mw.motor.client')
 const { updateQuotationforANO } = require('../services/quotation.service')
@@ -24,7 +25,9 @@ const SaveCareLog = (ResponseCareUser, StatusCode, ID, ParamSend, Config) => {
 
 module.exports = app => {
     Quotation.belongsTo(Customer, { foreignKey: 'CustomerID' });
+    Quotation.belongsTo(Agent, { foreignKey: 'AgentID' });
     let OldUser = '2021/10/05 00:00:00'
+    let NewUser = '2022/01/11 00:00:00'
     Quotation.findAll(
         {
             where: {
@@ -46,9 +49,14 @@ module.exports = app => {
                     model: Customer,
                     attributes: ['IDNo', 'CustomerName']
 
+                },
+                {
+                    model: Agent,
+                    attributes: ['ProfileID']
+
                 }
             ],
-            attributes: ['PolicyNo', 'MailFetchTries', 'QuotationID', 'CreateDate','StartDate'],
+            attributes: ['PolicyNo', 'MailFetchTries', 'QuotationID', 'UpdateDate','StartDate'],
             raw: false,
             order: [
                 ['QuotationID', 'DESC']
@@ -57,18 +65,19 @@ module.exports = app => {
         }).then(async (data) => {
 
             for (let i = 0; i < data.length; i++) {
-                const QuoteDate = data[i].CreateDate.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")
+                const QuoteDate = data[i].UpdateDate.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")
 
                 var AID = null
-                if (OldUser > QuoteDate) {
+                if (OldUser > QuoteDate) { //SysUser MW lama lihat kolom PHolder & AID
                     AID = EIICareUserOld(data[i].Customer.CustomerName, data[i].Customer.IDNo)
                 }
-                else {
+                else if (QuoteDate > OldUser && QuoteDate < NewUser){ //SysUser fixing Tapi ada bugs
+                    
                     AID = EIICareUser('', data[i].Customer.IDNo)
                 }
-
-                console.log(AID)
-                console.log(data[i].StartDate.toISOString())
+                else { //SysUserTerbaru & FIX  kolom PHolder & AID di MW
+                    AID = data[i].Agent.ProfileID
+                }
                 const dataGetANO = {
                     ID: AID,
                     PolicyNo: data[i].PolicyNo,

@@ -16,6 +16,8 @@ const DIRHTML = path.join(__dirname, '../../mail/usermail.html');
 const config = require('../../config/db.config')
 const Global = require("../../services/global.service")
 const {keyReturnCaptcha} = require('../../auth/token_validation')
+const MWClient = require('../../mw/motor/mw.motor.client')
+const SaveUser = require('../../models/care/saveuser.model')
 
 const DataLog = {
     QuotationID: null,
@@ -364,7 +366,27 @@ exports.createAgent = async (req, res) => {
         return;
     }
 
+    
+    const SysUserID = {
+        ID : req.body.ProfileID
+    }
+    const CheckSysUser = await MWClient.SearchSysUser(SysUserID)
+    console.log(CheckSysUser.data)
     var IDType = { "KTP": "K", "Passport": "P", "SIM": "S" }
+
+    if (CheckSysUser.data.code == 400) {
+        SaveUser.ID= req.body.ProfileID
+        SaveUser.Address_1 = req.body.Address
+        SaveUser.City = req.body.City
+        SaveUser.Email = req.body.Email
+        SaveUser.Mobile= req.body.PhoneNo
+        SaveUser.ID_Name = req.body.Name
+        SaveUser.ID_Type = 'KTP'
+        SaveUser.ID_No= req.body.IDNo
+        SaveUser.Name = req.body.Name
+        await MWClient.saveSysUser(SaveUser)
+    }
+    
 
     // Create a Post
     const post = {

@@ -20,6 +20,7 @@ module.exports = {
     // frontView_Upload :'/home/etiqa/eii_dsp/uploaded_chassis'
     motorproductid: "0201",
     saveUserCareURl: "https://uatmiddleware.etiqa.co.id/WebAPI//MiddlewareAPI/SaveSysUser",
+    saveProfileCareURl: "https://uatmiddleware.etiqa.co.id/WebAPI//MiddlewareAPI/SaveProfile",
     savePolicyCareURL: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SavePolicy",
     submitPolicyCareURL: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SubmitPolicy",
     searchStorePolicy: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SearchStoredPolicy",
