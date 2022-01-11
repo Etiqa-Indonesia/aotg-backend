@@ -1,6 +1,7 @@
 const db = require("../models");
 var pdf = require("pdf-creator-node");
 const Quote = db.Quotation;
+const Agent = db.Agent;
 const QuoteLog = db.QuotationLog;
 const QuoteDetailMV = db.QuotationMV;
 const Customer = db.Customer;
@@ -20,6 +21,8 @@ const { info } = require("console");
 const DIRDRAFTQUOT = path.join(__dirname, '../../quotationdraft/');
 const { SendMailDraftQuptation } = require('../services/backoffice/mail.quotation.service')
 const DirHTMLMailCreateQuote = path.join(__dirname, '../mail/calculatequotation.html');
+const { saveProfile } = require("../mw/motor/mw.motor.client");
+const SaveProfile = require("../models/care/saveprofile.model")
 
 var html = fs.readFileSync(DirHTMLMailCreateQuote, "utf8")
 var options = {
@@ -62,7 +65,7 @@ const ReffNo = (dataquot) => {
 
 module.exports = {
 
-    updateDynamicQuotation: async (QuotationID,data) => {
+    updateDynamicQuotation: async (QuotationID, data) => {
         console.log(data)
         await Quote.update({
             IsPaid: data.IsPaid,
@@ -311,6 +314,7 @@ module.exports = {
         Quote.hasOne(QuoteDetailMV, { foreignKey: 'QuotationID' });
         Quote.hasMany(Coverage, { foreignKey: 'QuotationID' });
         Quote.belongsTo(Customer, { foreignKey: 'CustomerID' });
+        Quote.belongsTo(Agent, { foreignKey: 'AgentID' })
         await Quote.findAll(
             {
                 where: data,
@@ -323,11 +327,15 @@ module.exports = {
                 {
                     model: Coverage,
                     attributes: { exclude: ['QuotationID'] }
-                }
-                    , {
+                },
+                {
                     model: Customer,
                     attributes: { exclude: ['QuotationID', 'CreateDate', 'UpdateDate'] }
 
+                },
+                {
+                    model: Agent,
+                    attributes: { exclude: ['JoinedDate', 'TerminatedDate'] }
                 }
                 ],
                 attributes: { exclude: ['CreateDate', 'UpdateDate'] },
@@ -337,24 +345,49 @@ module.exports = {
                 if (data != null) {
                     try {
                         var coverageDetails = [];
+                        const IDCheck = data[0]['Agent.AgentID'] + data[0]['Customer.IDNo'] + data[0]['Customer.CustomerID']
+                        const UseID = EIICareUser('', IDCheck)
                         for (let i = 0; i < data.length; i++) {
                             const coverage = data[i]['Coverages.RateCode']
                             coverageDetails.push(coverage);
                         }
 
+                        SaveUser.ID = data[0]['Agent.ProfileID']
+                        SaveUser.Address_1 = data[0]['Agent.Adress']
+                        SaveUser.City = data[0]['Agent.City']
+                        SaveUser.Email = data[0]['Agent.Email']
+                        SaveUser.Mobile = data[0]['Agent.PhoneNo']
+                        SaveUser.ID_Name = data[0]['Agent.Name']
+                        SaveUser.ID_Type = data[0]['Agent.IDType']
+                        SaveUser.ID_No = data[0]['Agent.IDNo']
+                        SaveUser.Name = data[0]['Agent.Name']
 
-                        SaveUser.ID = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
 
-                        SaveUser.BirthDate = formatDate(data[0]['Customer.BirthDate']);
-                        SaveUser.Email = data[0]['Customer.Email'].split(' ').join('');
-                        SaveUser.ID_Name = data[0]['Customer.CustomerName'];
-                        SaveUser.ID_No = data[0]['Customer.IDNo'];
-                        SaveUser.ID_Type = data[0]['Customer.IDType'];
-                        SaveUser.Mobile = data[0]['Customer.PhoneNo'];
-                        SaveUser.Name = data[0]['Customer.CustomerName'];
-                        SaveUser.Address_1 = data[0]['Customer.Address'];
-                        SaveUser.City = data[0]['Customer.City'];
-                        SaveUser.Gender = data[0]['Customer.Gender'];
+                        SaveProfile.ID = UseID
+                        SaveProfile.BirthDate = formatDate(data[0]['Customer.BirthDate']);
+                        SaveProfile.Email = data[0]['Customer.Email'].split(' ').join('');
+                        SaveProfile.ID_Name = data[0]['Customer.CustomerName'];
+                        SaveProfile.ID_No = UseID
+                        SaveProfile.ID_Type = data[0]['Customer.IDType'];
+                        SaveProfile.Name = data[0]['Customer.CustomerName'];
+                        SaveProfile.Mobile = data[0]['Customer.PhoneNo'];
+                        SaveProfile.Address_1 = data[0]['Customer.Address'];
+                        SaveProfile.Gender = data[0]['Customer.Gender'];
+                        SaveProfile.AID = data[0]['Agent.ProfileID']
+
+
+                        // SaveUser.ID = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
+
+                        // SaveUser.BirthDate = formatDate(data[0]['Customer.BirthDate']);
+                        // SaveUser.Email = data[0]['Customer.Email'].split(' ').join('');
+                        // SaveUser.ID_Name = data[0]['Customer.CustomerName'];
+                        // SaveUser.ID_No = data[0]['Customer.IDNo'];
+                        // SaveUser.ID_Type = data[0]['Customer.IDType'];
+                        // SaveUser.Mobile = data[0]['Customer.PhoneNo'];
+                        // SaveUser.Name = data[0]['Customer.CustomerName'];
+                        // SaveUser.Address_1 = data[0]['Customer.Address'];
+                        // SaveUser.City = data[0]['Customer.City'];
+                        // SaveUser.Gender = data[0]['Customer.Gender'];
 
 
 
@@ -386,8 +419,10 @@ module.exports = {
                         SavePolicy.CoverageCode8 = coverageDetails[7] == undefined ? null : coverageDetails[7];
                         SavePolicy.CoverageCode9 = coverageDetails[8] == undefined ? null : coverageDetails[8];
                         SavePolicy.CoverageCode10 = coverageDetails[9] == undefined ? null : coverageDetails[9];
-                        SavePolicy.PolicyHolder = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
-                        SavePolicy.AID = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
+                        // SavePolicy.PolicyHolder = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
+                        // SavePolicy.AID = EIICareUser(data[0]['Customer.CustomerName'], data[0]['Customer.IDNo']);
+                        SavePolicy.PolicyHolder = UseID
+                        SavePolicy.AID = data[0]['Agent.ProfileID']
                         SavePolicy.InsuredName = data[0]['Customer.CustomerName'];
                         SavePolicy.RefNo = ReffNo(data[0].QuotationID);
                         SavePolicy.DiscPCT = data[0].DiscPCT;
@@ -395,7 +430,10 @@ module.exports = {
 
                         let List = {
                             UserSys: SaveUser,
-                            PolicyData: SavePolicy
+                            PolicyData: SavePolicy,
+                            UserProfile : SaveProfile,
+                            IDSysUser : data[0]['Agent.ProfileID'],
+                            IDUserProfile : UseID
                         };
 
                         return callback(null, List);
@@ -716,12 +754,14 @@ module.exports = {
             CustomerName: datasend.CustomerName,
             AgentID: datasend.AgentID
         };
+
         await Customer.findAll(
             {
                 where: condition,
                 raw: true
             })
-            .then((data) => {
+            .then(async (data) => {
+
                 if (data[0] != null) {
                     try {
                         Customer.update({

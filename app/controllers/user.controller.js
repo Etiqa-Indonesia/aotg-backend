@@ -20,6 +20,7 @@ const { decrypt, encrypt } = require('../auth/encrypt')
 const { createLogBO } = require('../services/userlog.service')
 const { TrackEvent, InvoiceMidtrans } = require('../services/global.service')
 
+
 var transporter = nodemailer.createTransport({
     host: config.mailHost,
     port: config.mailPort,

@@ -51,6 +51,10 @@ const quote_client = {
     const data = http.post(`${AOTG}/save_sys_user`, payload)
     return data
   },
+  saveProfile (payload) {
+    const data = http.post(`${AOTG}/save_profile`, payload)
+    return data
+  },
   savePolicy (payload) {
     const data = http.post(`${AOTG}/save_policy`, payload)
     return data
@@ -65,6 +69,14 @@ const quote_client = {
   },
   GetAno (payload) {
     const data = http.post(`${AOTG}/searh_policy_stored`, payload)
+    return data
+  },
+  SearchSysUser (payload) {
+    const data = http.post(`${AOTG}/search_sys_user`, payload)
+    return data
+  },
+  SearchProfile (payload) {
+    const data = http.post(`${AOTG}/search_profile`, payload)
     return data
   },
   GetPolicyDetail (payload) {

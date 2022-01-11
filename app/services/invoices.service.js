@@ -58,6 +58,14 @@ module.exports = {
             }
         )
     },
+    findPaymentLinkByOrderID: async (OrderID) => {
+        return await Invoices.findOne(
+            {
+                where: { OrderID: OrderID },
+                attributes: ['PaymentRedirectURL']
+            }
+        )
+    },
     findInvoicesByOrderID: async (OrderID) => {
         return await Invoices.findOne(
             {

@@ -45,8 +45,23 @@ const EIICareUser = (dataname, datano) => {
     return EIIID
 }
 
+const DateFormatMMDDYY = (datedb) => {
+    var date = new Date(datedb);
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+
+    var formatdate= month + '/' + day + '/' + year
+
+    return formatdate
+}
+
 const EIICareUserOld = (dataname, datano) => {
-    var EIIID = 'AOTG-'+dataname +'-' + datano
+    var EIIID = 'AOTG-' + dataname + '-' + datano
     return EIIID
 }
 
@@ -92,7 +107,7 @@ const GenerateOrderID = (ProductID, QuotationID) => {
     let ReferenceYear = 2000
     let year = new Date().getFullYear() - ReferenceYear
 
-    const OrderID = year + ProductID + '-AOTG' + '-' + QuotationID + '-' +generateToday()
+    const OrderID = year + ProductID + '-AOTG' + '-' + QuotationID + '-' + generateToday()
 
     return OrderID
 }
@@ -221,5 +236,6 @@ module.exports = {
     InvoiceMidtrans: InvoiceMidtrans,
     EIICareUser: EIICareUser,
     GenerateOrderID: GenerateOrderID,
-    EIICareUserOld: EIICareUserOld
+    EIICareUserOld: EIICareUserOld,
+    DateFormatMMDDYY: DateFormatMMDDYY
 }
