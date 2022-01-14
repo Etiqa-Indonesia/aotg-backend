@@ -25,6 +25,7 @@ module.exports = {
     submitPolicyCareURL: "https://middleware.etiqa.co.id/WebAPI/MiddlewareAPI/ubmitPolicy",
     efilePolicyCareURL: "https://middleware.etiqa.co.id/WebAPI/MiddlewareAPI/EFile",
     searchStorePolicy: "https://middleware.etiqa.co.id/WebAPI/MiddlewareAPI/SearchStoredPolicy",
+    searchStoreClaim: "https://middleware.etiqa.co.id/WebAPI/MiddlewareAPI/SearchStoredClaim",
     searchStoreDetailPolicy: "https://middleware.etiqa.co.id/WebAPI/MiddlewareAPI/SearchStoredPolicy_Detail",
     uploadARBucket: "https://middleware.etiqa.co.id/WebAPI/MiddlewareAPI/UploadARBucket",
     gaTrackingID : 'UA-186333861-1',

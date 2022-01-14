@@ -86,6 +86,10 @@ const quote_client = {
   UploadARBucket (payload) {
     const data = http.post(`${AOTG}/upload_ar_bucket`, payload)
     return data
+  },
+  SearchStoreClaim (payload) {
+    const data = http.post(`${AOTG}/search_store_claim`, payload)
+    return data
   }
   // testget (payload) {
   //   return http.post('http://192.168.112.100/WebAPI/MiddlewareAPI/SearchProduct', payload)
