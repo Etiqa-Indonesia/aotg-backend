@@ -24,6 +24,7 @@ module.exports = {
     savePolicyCareURL: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SavePolicy",
     submitPolicyCareURL: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SubmitPolicy",
     searchStorePolicy: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SearchStoredPolicy",
+    searchStoreClaim: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SearchStoredClaim",
     searchStoreDetailPolicy: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/SearchStoredPolicy_Detail",
     efilePolicyCareURL: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/EFile",
     uploadARBucket: "https://uatmiddleware.etiqa.co.id/WebAPI/MiddlewareAPI/UploadARBucket",
