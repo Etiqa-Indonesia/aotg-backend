@@ -1,6 +1,6 @@
 const { getInvoiceList, InvoiceMidtrans, updateInvoices, findPaymentLinkByOrderID,
     validatePaymentSignature, findInvoicesByOrderID,
-    CountInvoiceList, TotalProductionSummary, TotalProductionList, CollectionStatus } = require('../services/invoices.service')
+    CountInvoiceList, TotalProductionSummary, TotalProductionList, CollectionStatus,findDetailInvoicesByOrderID } = require('../services/invoices.service')
 const { GenerateOrderID } = require('../services/global.service');
 const OriginalMidtransPaymentNotification = require('../models/response/OriginalMidtransPaymentNotification.model');
 const { createResponseLog } = require('../services/responselog.service')
@@ -23,6 +23,16 @@ const SaveCareLog = (ResponseCareUser, StatusCode, ID, ParamSend, Config) => {
 exports.TotalProductionSummary = async (req, res) => {
     const results = await TotalProductionSummary(
         req.params.AgentID, req.body.customername
+    )
+    res.status(200).json({
+        status: 200,
+        data: results
+    });
+
+};
+exports.findDetailInvoicesByOrderID = async (req, res) => {
+    const results = await findDetailInvoicesByOrderID(
+        req.params.order_id
     )
     res.status(200).json({
         status: 200,

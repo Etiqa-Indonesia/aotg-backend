@@ -74,6 +74,22 @@ module.exports = {
             }
         )
     },
+    findDetailInvoicesByOrderID: async (OrderID) => {
+        Invoices.belongsTo(Quote, { foreignKey: 'QuotationID' });
+        return await Invoices.findOne(
+            {
+                where: { OrderID: OrderID },
+                attributes: {exclude: ['ID','QuotationID']},
+                include: [
+                    {
+                        model: Quote,
+                        attributes: ['PolicyNo'],
+                        
+                    }
+                ],
+            }
+        )
+    },
     updateInvoices: async (QuotationID, data) => {
         await Invoices.update(data, {
             where: {
