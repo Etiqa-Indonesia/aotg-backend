@@ -6,7 +6,7 @@ const SaveUser = {
     ZipCode: null,
     AllowedF: true,
     LockedF: false,
-    BirthDate: "2021-04-20",
+    BirthDate: "1990-01-01",
     BirthPlace: null,
     City: null,
     Country: null,
@@ -21,10 +21,11 @@ const SaveUser = {
     Phone: null,
     RefID: null,
     RefName: null,
-    Role: "CLIENT",
+    Role: "AGENT",
     TaxID: null,
     Type: "COMMON",
-    ASource: "AOTG"
+    ASource: "AOTG",
+    ForceSyncF : true
 }
 
 module.exports = SaveUser

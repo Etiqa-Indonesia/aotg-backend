@@ -58,11 +58,35 @@ module.exports = {
             }
         )
     },
+    findPaymentLinkByOrderID: async (OrderID) => {
+        return await Invoices.findOne(
+            {
+                where: { OrderID: OrderID },
+                attributes: ['PaymentRedirectURL']
+            }
+        )
+    },
     findInvoicesByOrderID: async (OrderID) => {
         return await Invoices.findOne(
             {
                 where: { OrderID: OrderID },
                 attributes: ['QuotationID']
+            }
+        )
+    },
+    findDetailInvoicesByOrderID: async (OrderID) => {
+        Invoices.belongsTo(Quote, { foreignKey: 'QuotationID' });
+        return await Invoices.findOne(
+            {
+                where: { OrderID: OrderID },
+                attributes: {exclude: ['ID','QuotationID']},
+                include: [
+                    {
+                        model: Quote,
+                        attributes: ['PolicyNo'],
+                        
+                    }
+                ],
             }
         )
     },

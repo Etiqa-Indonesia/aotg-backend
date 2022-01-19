@@ -69,6 +69,21 @@ module.exports = {
 
         if (data.IsPaid.toLowerCase() === 'unpaid') {
             wherequotation.IsPaid = 0
+            if (data.PaymentTransactionFrom != null && data.PaymentTransactionTo == null) {
+                wherequotation.CreateDate = {
+                    [Op.gte]: data.PaymentTransactionFrom
+                }
+            }
+            if (data.PaymentTransactionFrom == null && data.PaymentTransactionTo != null) {
+                wherequotation.CreateDate = {
+                    [Op.lte]: data.PaymentTransactionTo
+                }
+            }
+            if (data.PaymentTransactionFrom != null && data.PaymentTransactionTo != null) {
+                wherequotation.CreateDate = {
+                    [Op.between]: [data.PaymentTransactionFrom, data.PaymentTransactionTo]
+                }
+            }
         }
         if (data.IsPaid.toLowerCase() === 'paid') {
             wherequotation.IsPaid = 1
