@@ -13,7 +13,11 @@ var transporter = nodemailer.createTransport({
     auth: {
         user: config.mailUser,
         pass: config.mailPass
-    }
+    },
+    tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false
+    },
 });
 var transporterEtiqa = nodemailer.createTransport({
     host: config.mailHostEtiqa,
@@ -95,26 +99,27 @@ module.exports = {
 
     },
     SendMailTest: async (callback) => {
-
-        const attachments = [
-            {
-                filename: '87_CS3.pdf',
-                //path: path.join(__dirname, '../../quotationdraft/'),
-                path: path.join(__dirname, '../../../quotationdraft/', '87_CS3.pdf'),
-                contentType: 'application/pdf'
-            }
-        ];
+        console.log('masuk sendmail')
+        // const attachments = [
+        //     {
+        //         filename: '87_CS3.pdf',
+        //         //path: path.join(__dirname, '../../quotationdraft/'),
+        //         path: path.join(__dirname, '../../../quotationdraft/', '87_CS3.pdf'),
+        //         contentType: 'application/pdf'
+        //     }
+        // ];
 
 
         var mailOptions = {
             from: config.mailUser,
             to: 'rhega.rofiat@etiqa.co.id',
             subject: "Test Send mail using Domain Etiqa",
-            attachments: attachments
+            //attachments: attachments
         };
 
-        transporter.sendMail(mailOptions, function (error, info) {
+       transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
+                console.log(error)
                 return callback(error, null);
             } else {
                 console.log("sent")
@@ -202,7 +207,7 @@ module.exports = {
 
             return 'Exist'
         } else {
-            return  'Not Exist'
+            return 'Not Exist'
         }
 
 

@@ -165,8 +165,8 @@ exports.ApproveQuote = async (req, res) => {
     var requrl = url.format(urlobj);
 
     ApproveQuoteByPK(datasend, async (err, results) => {
-        createQuoteLogBackOffice(dataQuolog);
-        updateQuotationforQuoteBackOffice(dataQuolog);
+        await createQuoteLogBackOffice(dataQuolog);
+        await updateQuotationforQuoteBackOffice(dataQuolog);
         if (err) {
             res.status(400).send({
                 status: 400,
@@ -220,61 +220,6 @@ exports.ApproveQuote = async (req, res) => {
                 }
 
             });
-
-
-            // SaveUser(JSON.stringify(results.UserSys), (err, resUser) => {
-            //     if (err) {
-            //         const Response = "Error Cek Param yang dikirim & Save User gagal dilakukan";
-            //         const Status = 422;
-            //         SaveCareLog(Response, Status, req.params.id, results.UserSys, config.saveUserCareURl);
-            //     }
-            //     else {
-            //         ResponseCareUser = resUser.data;
-            //         SaveCareLog(JSON.stringify(ResponseCareUser), ResponseCareUser.code,
-            //             req.params.id, results.UserSys, config.saveUserCareURl);
-
-            //         SavePolicy(JSON.stringify(results.PolicyData), (err, resultPolicy) => {
-            //             if (err) {
-            //                 const Response = "Error Cek Param yang dikirim & Save Policy gagal dilakukan";
-            //                 const Status = 422;
-            //                 SaveCareLog(Response, Status, req.params.id, results.PolicyData, config.savePolicyCareURL);
-            //             }
-            //             else {
-            //                 ResponseCarePolicy = resultPolicy.data;
-            //                 SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
-            //                     req.params.id, results.PolicyData, config.savePolicyCareURL);
-            //                 const paramUpdate = {
-            //                     PolicyNo: ResponseCarePolicy.Data[0].PolicyNo,
-            //                     RefferenceNumber: ResponseCarePolicy.Data[0].RefNo,
-            //                     CarePolicyID: ResponseCarePolicy.Data[0].PID
-            //                 }
-            //                 updateQuotationforPolicy(req.params.id, paramUpdate);
-            //                 const paramSubmitPolicy = {
-            //                     PID: ResponseCarePolicy.Data[0].PID
-            //                 }
-
-            //                 SubmitPolicy(JSON.stringify(paramSubmitPolicy), (err, resultSubPolicy) => {
-            //                     if (err) {
-            //                         const Response = "Error Cek Param yang dikirim & Submit Policy gagal dilakukan";
-            //                         const Status = 422;
-            //                         SaveCareLog(Response, Status, req.params.id, JSON.stringify(paramSubmitPolicy), config.submitPolicyCareURL);
-            //                     }
-            //                     else {
-            //                         ResponseCarePolicy = resultSubPolicy.data;
-            //                         SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
-            //                             req.params.id, paramSubmitPolicy, config.submitPolicyCareURL);
-            //                         const paramUpdate = {
-            //                             IsSubmittedCare: 1
-            //                         }
-            //                         updateQuotationforSubmitPolicy(req.params.id, paramUpdate);
-            //                     }
-
-            //                 });
-            //             }
-
-            //         });
-            //     }
-            // });
             res.status(200).send({
                 status: 200,
                 message: 'Quotation berhasil di Approve, Tunggu beberapa menit hingga File Polis terkirim'
@@ -514,28 +459,28 @@ exports.CreateQuote = async (req, res) => {
                 createorupdateCustomer(dataCustomer, async (err, resultsC) => {
                     updateCustomerQuotation(QuotationID, resultsC);
                     customerresult = resultsC;
-                    const IDCheck = req.body.agentid + dataCustomer.IDNo + resultsC
-                    const paramCheckProfileMW = {
-                        ID: EIICareUser('', IDCheck)
-                    }
-                    // const resultProfileMW = await MwClient.SearchProfile(paramCheckProfileMW)
-
-                    // if (resultProfileMW.data.code === 400) {
-                    SaveProfile.ID = EIICareUser('', IDCheck)
-                    SaveProfile.BirthDate = dataCustomer.BirthDate
-                    SaveProfile.Email = dataCustomer.Email
-                    SaveProfile.ID_Name = dataCustomer.CustomerName
-                    SaveProfile.ID_No = EIICareUser('', IDCheck)
-                    SaveProfile.ID_Type = dataCustomer.IDType
-                    SaveProfile.Name = dataCustomer.CustomerName
-                    SaveProfile.Mobile = dataCustomer.PhoneNo
-                    SaveProfile.Address_1 = dataCustomer.Address
-                    SaveProfile.Gender = dataCustomer.Gender
-                    SaveProfile.AID = AgentCheck.ProfileID
-
-                    const abc = await MwClient.saveProfile(SaveProfile) //saveprofile 
-                    console.log(abc.data)
+                    // const IDCheck = req.body.agentid + dataCustomer.IDNo + resultsC
+                    // const paramCheckProfileMW = {
+                    //     ID: EIICareUser('', IDCheck)
                     // }
+                    // // const resultProfileMW = await MwClient.SearchProfile(paramCheckProfileMW)
+
+                    // // if (resultProfileMW.data.code === 400) {
+                    // SaveProfile.ID = EIICareUser('', IDCheck)
+                    // SaveProfile.BirthDate = dataCustomer.BirthDate
+                    // SaveProfile.Email = dataCustomer.Email
+                    // SaveProfile.ID_Name = dataCustomer.CustomerName
+                    // SaveProfile.ID_No = EIICareUser('', IDCheck)
+                    // SaveProfile.ID_Type = dataCustomer.IDType
+                    // SaveProfile.Name = dataCustomer.CustomerName
+                    // SaveProfile.Mobile = dataCustomer.PhoneNo
+                    // SaveProfile.Address_1 = dataCustomer.Address
+                    // SaveProfile.Gender = dataCustomer.Gender
+                    // SaveProfile.AID = AgentCheck.ProfileID
+
+                    // //const abc = await MwClient.saveProfile(SaveProfile) //saveprofile 
+                    // console.log(abc.data)
+                    // // }
 
                 });
                 const DataUpdate = {
@@ -548,8 +493,8 @@ exports.CreateQuote = async (req, res) => {
                 DataSendMail.QuotationID = QuotationID;
                 // console.log(DataLog)
 
-                createResponseLog(DataLog);
-                updateQuoteDetail(dataVehicle);
+                await createResponseLog(DataLog);
+                await updateQuoteDetail(dataVehicle);
                 const dataQuolog = {
                     QuotationID: QuotationID,
                     Remarks: "Resubmit Quote",
@@ -558,12 +503,12 @@ exports.CreateQuote = async (req, res) => {
                 };
 
 
-                createQuoteLogBackOffice(dataQuolog);
-                updateCoverageDetail(PremiumDetails, QuotationID,
+                await createQuoteLogBackOffice(dataQuolog);
+                await updateCoverageDetail(PremiumDetails, QuotationID,
                     req.body.sum_insured_1, req.body.discount_pct);
 
                 if (dataQuotes.Status == "0")
-                    SendMail(DataSendMail);
+                    await SendMail(DataSendMail);
 
 
                 res.status(200).send({
@@ -594,38 +539,38 @@ exports.CreateQuote = async (req, res) => {
                         //await SendMailDraftQuptation(data.customer_detail.email, 'Premium Calculation Vehicle', outputpdf, DIRDRAFTQUOT, data, 'Send Draft Calculation Quote')
                     }
                     createorupdateCustomer(dataCustomer, async (err, resultsC) => {
-                        updateCustomerQuotation(results.QuotationID, resultsC);
+                        await updateCustomerQuotation(results.QuotationID, resultsC);
                         customerresult = resultsC;
 
-                        const IDCheck = req.body.agentid + dataCustomer.IDNo + resultsC
-                        const paramCheckProfileMW = {
-                            ID: EIICareUser('', IDCheck)
-                        }
-                        // const resultProfileMW = await MwClient.SearchProfile(paramCheckProfileMW)
-
-                        // if (resultProfileMW.data.code === 400) {
-                        SaveProfile.ID = EIICareUser('', IDCheck)
-                        SaveProfile.BirthDate = dataCustomer.BirthDate
-                        SaveProfile.Email = dataCustomer.Email
-                        SaveProfile.ID_Name = dataCustomer.CustomerName
-                        SaveProfile.ID_No = EIICareUser('', IDCheck)
-                        SaveProfile.ID_Type = dataCustomer.IDType
-                        SaveProfile.Name = dataCustomer.CustomerName
-                        SaveProfile.Mobile = dataCustomer.PhoneNo
-                        SaveProfile.Address_1 = dataCustomer.Address
-                        SaveProfile.Gender = dataCustomer.Gender
-                        SaveProfile.AID = AgentCheck.ProfileID
-
-                        await MwClient.saveProfile(SaveProfile)
+                        // const IDCheck = req.body.agentid + dataCustomer.IDNo + resultsC
+                        // const paramCheckProfileMW = {
+                        //     ID: EIICareUser('', IDCheck)
                         // }
+                        // // const resultProfileMW = await MwClient.SearchProfile(paramCheckProfileMW)
+
+                        // // if (resultProfileMW.data.code === 400) {
+                        // SaveProfile.ID = EIICareUser('', IDCheck)
+                        // SaveProfile.BirthDate = dataCustomer.BirthDate
+                        // SaveProfile.Email = dataCustomer.Email
+                        // SaveProfile.ID_Name = dataCustomer.CustomerName
+                        // SaveProfile.ID_No = EIICareUser('', IDCheck)
+                        // SaveProfile.ID_Type = dataCustomer.IDType
+                        // SaveProfile.Name = dataCustomer.CustomerName
+                        // SaveProfile.Mobile = dataCustomer.PhoneNo
+                        // SaveProfile.Address_1 = dataCustomer.Address
+                        // SaveProfile.Gender = dataCustomer.Gender
+                        // SaveProfile.AID = AgentCheck.ProfileID
+
+                        // //await MwClient.saveProfile(SaveProfile)
+                        // // }
 
                     });
                     dataVehicle.QuotationID = results.QuotationID;
                     DataSendMail.QuotationID = results.QuotationID;
                     DataLog.QuotationID = results.QuotationID;
                     DataLog.Response = JSON.stringify(results);
-                    createResponseLog(DataLog);
-                    createQuoteDetail(dataVehicle);
+                    await createResponseLog(DataLog);
+                    await createQuoteDetail(dataVehicle);
                     //createQuoteLog(results);
 
                     const dataQuolog = {
@@ -635,11 +580,11 @@ exports.CreateQuote = async (req, res) => {
                         UserID: req.body.userid
                     };
 
-                    createQuoteLogBackOffice(dataQuolog);
+                    await createQuoteLogBackOffice(dataQuolog);
                     if (dataQuotes.Status == "0")
                         SendMail(DataSendMail);
 
-                    createCoverageDetail(PremiumDetails, results.QuotationID,
+                    await createCoverageDetail(PremiumDetails, results.QuotationID,
                         req.body.sum_insured_1, req.body.discount_pct);
 
                     await res.status(200).send({

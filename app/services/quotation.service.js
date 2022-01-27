@@ -770,7 +770,9 @@ module.exports = {
                             Address: datasend.Address,
                             Gender: datasend.Gender,
                             BirthDate: datasend.BirthDate,
-                            PhoneNo: datasend.PhoneNo
+                            PhoneNo: datasend.PhoneNo,
+                            ZipCode : datasend.ZipCode,
+                            City: datasend.City
                         }, {
                             where: {
                                 CustomerID: data[0].CustomerID

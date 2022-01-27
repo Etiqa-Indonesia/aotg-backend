@@ -31,16 +31,23 @@ module.exports = {
     gaTrackingID : 'UA-186333861-1',
 
     // mailHost: "smtp.gmail.com",
-    // mailPort: 5887,
+    // mailPort: 587,
     // mailSecure: false,
     // mailUser : 'etiqanoreply@gmail.com',
     // mailPass : '2WSX3edc',
 
-    mailHost: "esa.etiqa.co.id",
-    mailPort: 25,
+    mailHost: "exchange.asokadc.com",
+    mailPort: 587,
     mailSecure: false,
     mailUser: 'aotgnoreply@etiqa.co.id',
-    mailPass: '2WSX3edc',
+    mailPass: '@A0tgM4il',
+    
+
+    // mailHost: "esa.etiqa.co.id",
+    // mailPort: 25,
+    // mailSecure: false,
+    // mailUser: 'aotgnoreply@etiqa.co.id',
+    // mailPass: '2WSX3edc',
 
     statusNew: "0",
     statusApprove: "1",
