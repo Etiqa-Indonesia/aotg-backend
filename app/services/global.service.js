@@ -141,7 +141,11 @@ var transporter = nodemailer.createTransport({
     auth: {
         user: config.mailUser,
         pass: config.mailPass
-    }
+    },
+    tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false
+    },
 });
 
 const sendMail = async (to, subject, filename, path, id, MailInfo) => {
