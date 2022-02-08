@@ -10,7 +10,6 @@ const Invoices = db.Invoices;
 const motorout = require('../models/response/QuoteMotor.model')
 const SaveUser = require('../models/care/saveuser.model')
 const SavePolicy = require('../models/care/savepolicy.model')
-const http = require('../mw/http')
 const MwClient = require('../mw/motor/mw.motor.client');
 const config = require("../config/mw.config");
 const configdb = require("../config/db.config");

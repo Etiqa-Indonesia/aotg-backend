@@ -11,7 +11,7 @@ module.exports = app => {
 
     router.get("/invoicescount/toc/:TOC/agentid/:AgentID", checktoken, payment.CountInvoiceList)
     router.post("/invoices",checktoken,payment.InvoiceMidtrans)
-    router.get("/checkinvoices/:order_id",checktoken,payment.findDetailInvoicesByOrderID)
+    router.get("/checkinvoices/:order_id",payment.findDetailInvoicesByOrderID)
 
     // router.get("/validsig", checktoken, payment.validatePaymentSignature)
 
