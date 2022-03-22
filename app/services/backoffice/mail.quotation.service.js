@@ -112,7 +112,7 @@ module.exports = {
 
         var mailOptions = {
             from: config.mailUser,
-            to: 'rhega.rofiat@etiqa.co.id',
+            to: 'rhegafhazry1992@gmail.com',
             subject: "Test Send mail using Domain Etiqa",
             //attachments: attachments
         };

@@ -1,4 +1,4 @@
-var https = require('../http')
+var https = require('../https')
 
 const AUTOAPI = '/auto/api'
 const MOTORAPI = '/aotg/motor/api'

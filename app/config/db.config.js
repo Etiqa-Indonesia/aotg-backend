@@ -3,6 +3,11 @@ module.exports = {
     USER: process.env.NODE_ENV === 'production' ? '1c47530f89d82766a48399c860d3ac20' : '29d7046125904d4cc5a95ead0679824c',
     PASSWORD: process.env.NODE_ENV === 'production' ? 'd278286520d29f3b69c615f0ab0a3bcd' : 'd4cf75f3938d4a62d83b7c3a554ecf62',
     DB: process.env.NODE_ENV === 'production' ? 'c29f9627ec036de0b6c41186c4b0edc5' : 'c29f9627ec036de0b6c41186c4b0edc5',
+
+    // HOST: process.env.NODE_ENV === 'production' ? '856e428f01a69c08d2968863e66c50bc' : 'e0f2302b3106a0d0a0b5590957509f88', 
+    // USER: process.env.NODE_ENV === 'production' ? '1c47530f89d82766a48399c860d3ac20' : '29d7046125904d4cc5a95ead0679824c',
+    // PASSWORD: process.env.NODE_ENV === 'production' ? 'd278286520d29f3b69c615f0ab0a3bcd' : '3f967039b4df17ff297529b7e77a8279',
+    // DB: process.env.NODE_ENV === 'production' ? 'c29f9627ec036de0b6c41186c4b0edc5' : '68a4ecf01060e192f6a223361f2fe83e',
     dialect: "mariadb",
     pool: {
         max: 5, // maximum number of connection in pool

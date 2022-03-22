@@ -101,13 +101,13 @@ module.exports = {
                     DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
                 }
                 else if (data.premium_details[i]['coverage_code'] == "PA-01") {
-                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_3)
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_4)
                     DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
                     DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
 
                 }
                 else if (data.premium_details[i]['coverage_code'] == "PA-02") {
-                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_4)
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_3)
                     DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
                     DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
                 }
