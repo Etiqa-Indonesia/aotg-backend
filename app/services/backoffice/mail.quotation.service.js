@@ -100,6 +100,10 @@ module.exports = {
     },
     SendMailTest: async (callback) => {
         console.log('masuk sendmail')
+        console.log(config.mailHost)
+        console.log(config.mailPort)
+        console.log(config.mailPass)
+        console.log(config.mailUser)
         // const attachments = [
         //     {
         //         filename: '87_CS3.pdf',

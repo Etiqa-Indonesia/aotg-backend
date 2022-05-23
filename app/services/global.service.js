@@ -33,7 +33,8 @@ const InvoiceMidtrans = async (data, res) => {
             "gross_amount": 200000
         }, "credit_card": {
             "secure": true
-        }
+        },
+        // "enabled_payments": ["gopay"]
     };
 
     const redirectURL = await snap.createTransaction(parameter)
