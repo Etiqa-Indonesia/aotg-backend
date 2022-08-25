@@ -1,7 +1,7 @@
 module.exports = {
-    HOST: process.env.NODE_ENV === 'production' ? '856e428f01a69c08d2968863e66c50bc' : '856e428f01a69c08d2968863e66c50bc', 
-    USER: process.env.NODE_ENV === 'production' ? '1c47530f89d82766a48399c860d3ac20' : '1c47530f89d82766a48399c860d3ac20',
-    PASSWORD: process.env.NODE_ENV === 'production' ? 'd278286520d29f3b69c615f0ab0a3bcd' : 'd278286520d29f3b69c615f0ab0a3bcd',
+    HOST: process.env.NODE_ENV === 'production' ? '856e428f01a69c08d2968863e66c50bc' : 'a67909b85fdd36a7fb4c777708033d2c', 
+    USER: process.env.NODE_ENV === 'production' ? '1c47530f89d82766a48399c860d3ac20' : 'ec3bb22c438277a08fabab129c41fcee',
+    PASSWORD: process.env.NODE_ENV === 'production' ? 'd278286520d29f3b69c615f0ab0a3bcd' : '8a2bae74a64c5bde21c41841599e1e64',
     DB: process.env.NODE_ENV === 'production' ? 'c29f9627ec036de0b6c41186c4b0edc5' : 'c29f9627ec036de0b6c41186c4b0edc5',
     dialect: "mariadb",
     pool: {
@@ -62,7 +62,7 @@ module.exports = {
     KEY: "12345678901234567890123456789012",
     IV: "1234567890123456",
     ALGO: "aes-256-cbc",
-    mailMarketing:"rhega.rofiat@etiqa.co.id",
+    mailMarketing:"fadhla.mahesa@etiqa.co.id,febri.famuandri@etiqa.co.id",
     limitCompre : "10",
     limitTLO :"15",
     truckType :["trailer","tronton"],

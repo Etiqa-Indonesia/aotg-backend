@@ -1,4 +1,4 @@
-var http = require('../http')
+var https = require('../https')
 
 const AUTOAPI = '/auto/api'
 const MOTORAPI = '/aotg/motor/api'
@@ -6,89 +6,89 @@ const AOTG = '/aotg'
 
 const listing_client = {
   fetchProducts () {
-    return http.get('/products')
+    return https.get('/products')
   },
   fetchCoverages (product_id) {
-    return http.get(`/products/${product_id}/coverages`)
+    return https.get(`/products/${product_id}/coverages`)
   },
   fetchCoverageDetails (product_id, coverage_id) {
-    return http.get(`/products/${product_id}/coverages/${coverage_id}/coverage_details`)
+    return https.get(`/products/${product_id}/coverages/${coverage_id}/coverage_details`)
   },
   fetchCountries () {
-    return http.get(`${AUTOAPI}/countries`)
+    return https.get(`${AUTOAPI}/countries`)
   },
   fetchRegions () {
-    return http.get(`${AUTOAPI}/regions`)
+    return https.get(`${AUTOAPI}/regions`)
   },
   fetchVehicleBrands () {
-    return http.get(`${AUTOAPI}/vehicles/brands`)
+    return https.get(`${AUTOAPI}/vehicles/brands`)
   },
   fetchVehicleModels (brand_id) {
-    return http.get(`${AUTOAPI}/vehicles/brands/${brand_id}/models`)
+    return https.get(`${AUTOAPI}/vehicles/brands/${brand_id}/models`)
   },
   fetchVehicleTypes (brand_id, model_id) {
-    return http.get(`${AUTOAPI}/vehicles/brands/${brand_id}/models/${model_id}/types`)
+    return https.get(`${AUTOAPI}/vehicles/brands/${brand_id}/models/${model_id}/types`)
   },
   fetchCharities () {
-    return http.get(`${AUTOAPI}/charities`)
+    return https.get(`${AUTOAPI}/charities`)
   },
   fetchManufactureYears () {
-    return http.get(`${AUTOAPI}/vehicles/manufacture_years`)
+    return https.get(`${AUTOAPI}/vehicles/manufacture_years`)
   },
   fetchProvince () {
-    return http.get(`https://dev.farizdotid.com/api/daerahindonesia/provinsi`)
+    return https.get(`https://dev.farizdotid.com/api/daerahindonesia/provinsi`)
   }
 }
 
 const quote_client = {
   quickPremium (payload) {
-    return http.post(`${MOTORAPI}/quotes/calculate_inaccurate_premium`, payload)
+    return https.post(`${MOTORAPI}/quotes/calculate_inaccurate_premium`, payload)
   },
   calculatePremium (payload) {
-    return http.post(`${MOTORAPI}/quotes/calculate_premium`, payload)
+    return https.post(`${MOTORAPI}/quotes/calculate_premium`, payload)
   },
   saveSysUser (payload) {
-    const data = http.post(`${AOTG}/save_sys_user`, payload)
+    const data = https.post(`${AOTG}/save_sys_user`, payload)
     return data
   },
   saveProfile (payload) {
-    const data = http.post(`${AOTG}/save_profile`, payload)
+    const data = https.post(`${AOTG}/save_profile`, payload)
     return data
   },
   savePolicy (payload) {
-    const data = http.post(`${AOTG}/save_policy`, payload)
+    const data = https.post(`${AOTG}/save_policy`, payload)
     return data
   },
   submitPolicy (payload) {
-    const data = http.post(`${AOTG}/submit_policy`, payload)
+    const data = https.post(`${AOTG}/submit_policy`, payload)
     return data
   },
   eFIle (payload) {
-    const data = http.post(`${AOTG}/efile`, payload)
+    const data = https.post(`${AOTG}/efile`, payload)
     return data
   },
   GetAno (payload) {
-    const data = http.post(`${AOTG}/searh_policy_stored`, payload)
+    const data = https.post(`${AOTG}/searh_policy_stored`, payload)
     return data
   },
   SearchSysUser (payload) {
-    const data = http.post(`${AOTG}/search_sys_user`, payload)
+    const data = https.post(`${AOTG}/search_sys_user`, payload)
     return data
   },
   SearchProfile (payload) {
-    const data = http.post(`${AOTG}/search_profile`, payload)
+    const data = https.post(`${AOTG}/search_profile`, payload)
     return data
   },
   GetPolicyDetail (payload) {
-    const data = http.post(`${AOTG}/search_policy_detail_stored`, payload)
+    const data = https.post(`${AOTG}/search_policy_detail_stored`, payload)
     return data
   },
   UploadARBucket (payload) {
-    const data = http.post(`${AOTG}/upload_ar_bucket`, payload)
+    const data = https.post(`${AOTG}/upload_ar_bucket`, payload)
     return data
   },
   SearchStoreClaim (payload) {
-    const data = http.post(`${AOTG}/search_store_claim`, payload)
+    const data = https.post(`${AOTG}/search_store_claim`, payload)
     return data
   }
   // testget (payload) {

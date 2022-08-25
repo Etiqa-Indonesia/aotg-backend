@@ -180,7 +180,7 @@ exports.ApproveQuote = async (req, res) => {
             SaveCareLog(JSON.stringify(resultsysuser.data), resultsysuser.data.code, req.params.id, results.UserSys, config.saveUserCareURl)
             const resultuserProfile = await MwClient.saveProfile(JSON.stringify(results.UserProfile))
             SaveCareLog(JSON.stringify(resultuserProfile.data), resultuserProfile.data.code, req.params.id, results.UserProfile, config.saveProfileCareURl)
-            SavePolicy(JSON.stringify(results.PolicyData), (err, resultPolicy) => {
+            await SavePolicy(JSON.stringify(results.PolicyData), (err, resultPolicy) => {
                 if (err) {
                     const Response = "Error Cek Param yang dikirim & Save Policy gagal dilakukan";
                     const Status = 422;
@@ -296,8 +296,8 @@ exports.CreateQuote = async (req, res) => {
     const ToproParamBasedOnYear = year - VehicleDetails.manufactured_year
     const AgentType = await findAgentType(req.body.agentid)
     var ToproIsUsed;
-
-    if (ToproParamBasedOnYear > 5 || dbConfig.truckType.indexOf(PrintData.type.toLowerCase()) !== -1) {
+    //untuk type agent != R
+    if (AgentType.Type !== 'R' && (ToproParamBasedOnYear > 5 || dbConfig.truckType.indexOf(PrintData.type.toLowerCase()) !== -1)) {
         const result = await FindToproUsed(PrintData.type, AgentType.Type, KompreOrTLO)
         ToproIsUsed = result.Topro
     }
