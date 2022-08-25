@@ -18,6 +18,7 @@ var transporter = nodemailer.createTransport({
         // do not fail on invalid certs
         rejectUnauthorized: false
     },
+    auth :'PLAIN'
 });
 var transporterEtiqa = nodemailer.createTransport({
     host: config.mailHostEtiqa,
@@ -27,6 +28,7 @@ var transporterEtiqa = nodemailer.createTransport({
         user: config.mailUserEtiqa,
         pass: config.mailPassEtiqa
     }
+
 });
 const DataLog = {
     QuotationID: null,
@@ -100,7 +102,7 @@ module.exports = {
     },
     SendMailTest: async (callback) => {
         console.log('masuk sendmail')
-        console.log(config.mailHost)
+	console.log(config.mailHost)
         console.log(config.mailPort)
         console.log(config.mailPass)
         console.log(config.mailUser)

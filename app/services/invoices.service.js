@@ -111,7 +111,7 @@ module.exports = {
                 "order_id": GenerateOrderID(data.productid, data.quotationid),
                 "gross_amount": data.amount
             },
-            // "enabled_payments": ["gopay"]
+            //"enabled_payments": ["gopay"]
         };
         const results = {
             message: null,
