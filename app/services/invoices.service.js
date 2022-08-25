@@ -7,7 +7,8 @@ const Customer = db.Customer;
 const dbConfig = require('../config/db.config')
 const midtransClient = require('midtrans-client');
 const { GenerateOrderID } = require('../services/global.service')
-const crypto = require('crypto')
+const crypto = require('crypto');
+const { config } = require("process");
 
 
 module.exports = {
@@ -100,6 +101,7 @@ module.exports = {
     },
     InvoiceMidtrans: async (data, res) => {
         let snap = new midtransClient.Snap({
+            isProduction : dbConfig.isProduction,
             serverKey: dbConfig.server_key,
             clientKey: dbConfig.client_key
         });
@@ -108,7 +110,8 @@ module.exports = {
             "transaction_details": {
                 "order_id": GenerateOrderID(data.productid, data.quotationid),
                 "gross_amount": data.amount
-            }
+            },
+            //"enabled_payments": ["gopay"]
         };
         const results = {
             message: null,

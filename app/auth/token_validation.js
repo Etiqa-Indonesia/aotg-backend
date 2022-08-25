@@ -1,7 +1,7 @@
 const { verify , sign} = require("jsonwebtoken");
 const dbkey = require("../config/db.config")
 const { getUserToken } = require('../services/user.service')
-const http = require('../mw/http')
+const https = require('../mw/http')
 const { updateToken } = require('../services/user.service')
 const { encrypt, encryptjs } = require('../auth/encrypt')
 
@@ -79,7 +79,6 @@ module.exports = {
             token = token.slice(7);
             verify(token, dbkey.key, async (err, authData) => {
                 if (err && err.message === 'jwt expired') {
-                    console.log(err)
                     return res.status(200).send({
                         success: 400,
                         message: "Token Expired, Please Login Again",
@@ -136,7 +135,7 @@ module.exports = {
         const secretKey = dbkey.keyCaptcha;
         const userIp = dbkey.domainKey;
 
-        const Result = await http.get(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}&remoteip=${userIp}`)
+        const Result = await https.get(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}&remoteip=${userIp}`)
 
         if (Result.data.success === false) {
             return res.status(200).send({

@@ -10,7 +10,6 @@ const Invoices = db.Invoices;
 const motorout = require('../models/response/QuoteMotor.model')
 const SaveUser = require('../models/care/saveuser.model')
 const SavePolicy = require('../models/care/savepolicy.model')
-const http = require('../mw/http')
 const MwClient = require('../mw/motor/mw.motor.client');
 const config = require("../config/mw.config");
 const configdb = require("../config/db.config");
@@ -102,13 +101,13 @@ module.exports = {
                     DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
                 }
                 else if (data.premium_details[i]['coverage_code'] == "PA-01") {
-                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_3)
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_4)
                     DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
                     DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
 
                 }
                 else if (data.premium_details[i]['coverage_code'] == "PA-02") {
-                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_4)
+                    DetailCoverage.CoverageDetail = data.premium_details[i]['coverage_detail'] + ' Nilai Pertanggungan ' + await numberWithCommas(data.sum_insured_3)
                     DetailCoverage.CoveragesValue = await numberWithCommas(data.premium_details[i]['amount'])
                     DetailCoverage.CoverageDetailPrintBottom = data.premium_details[i]['coverage_detail']
                 }
