@@ -33,7 +33,8 @@ const InvoiceMidtrans = async (data, res) => {
             "gross_amount": 200000
         }, "credit_card": {
             "secure": true
-        }
+        },
+        // "enabled_payments": ["gopay"]
     };
 
     const redirectURL = await snap.createTransaction(parameter)
@@ -45,8 +46,23 @@ const EIICareUser = (dataname, datano) => {
     return EIIID
 }
 
+const DateFormatMMDDYY = (datedb) => {
+    var date = new Date(datedb);
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+
+    var formatdate= month + '/' + day + '/' + year
+
+    return formatdate
+}
+
 const EIICareUserOld = (dataname, datano) => {
-    var EIIID = 'AOTG-'+dataname +'-' + datano
+    var EIIID = 'AOTG-' + dataname + '-' + datano
     return EIIID
 }
 
@@ -92,7 +108,7 @@ const GenerateOrderID = (ProductID, QuotationID) => {
     let ReferenceYear = 2000
     let year = new Date().getFullYear() - ReferenceYear
 
-    const OrderID = year + ProductID + '-AOTG' + '-' + QuotationID + '-' +generateToday()
+    const OrderID = year + ProductID + '-AOTG' + '-' + QuotationID + '-' + generateToday()
 
     return OrderID
 }
@@ -126,7 +142,11 @@ var transporter = nodemailer.createTransport({
     auth: {
         user: config.mailUser,
         pass: config.mailPass
-    }
+    },
+    tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false
+    },
 });
 
 const sendMail = async (to, subject, filename, path, id, MailInfo) => {
@@ -221,5 +241,6 @@ module.exports = {
     InvoiceMidtrans: InvoiceMidtrans,
     EIICareUser: EIICareUser,
     GenerateOrderID: GenerateOrderID,
-    EIICareUserOld: EIICareUserOld
+    EIICareUserOld: EIICareUserOld,
+    DateFormatMMDDYY: DateFormatMMDDYY
 }

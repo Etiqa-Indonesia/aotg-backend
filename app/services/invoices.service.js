@@ -7,7 +7,8 @@ const Customer = db.Customer;
 const dbConfig = require('../config/db.config')
 const midtransClient = require('midtrans-client');
 const { GenerateOrderID } = require('../services/global.service')
-const crypto = require('crypto')
+const crypto = require('crypto');
+const { config } = require("process");
 
 
 module.exports = {
@@ -58,11 +59,35 @@ module.exports = {
             }
         )
     },
+    findPaymentLinkByOrderID: async (OrderID) => {
+        return await Invoices.findOne(
+            {
+                where: { OrderID: OrderID },
+                attributes: ['PaymentRedirectURL']
+            }
+        )
+    },
     findInvoicesByOrderID: async (OrderID) => {
         return await Invoices.findOne(
             {
                 where: { OrderID: OrderID },
                 attributes: ['QuotationID']
+            }
+        )
+    },
+    findDetailInvoicesByOrderID: async (OrderID) => {
+        Invoices.belongsTo(Quote, { foreignKey: 'QuotationID' });
+        return await Invoices.findOne(
+            {
+                where: { OrderID: OrderID },
+                attributes: {exclude: ['ID','QuotationID']},
+                include: [
+                    {
+                        model: Quote,
+                        attributes: ['PolicyNo'],
+                        
+                    }
+                ],
             }
         )
     },
@@ -76,6 +101,7 @@ module.exports = {
     },
     InvoiceMidtrans: async (data, res) => {
         let snap = new midtransClient.Snap({
+            isProduction : dbConfig.isProduction,
             serverKey: dbConfig.server_key,
             clientKey: dbConfig.client_key
         });
@@ -84,7 +110,8 @@ module.exports = {
             "transaction_details": {
                 "order_id": GenerateOrderID(data.productid, data.quotationid),
                 "gross_amount": data.amount
-            }
+            },
+            //"enabled_payments": ["gopay"]
         };
         const results = {
             message: null,

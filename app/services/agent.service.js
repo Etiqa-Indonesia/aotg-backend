@@ -11,4 +11,12 @@ module.exports = {
             }
         )
     },
+    findAgentProfile : async(AgentID) =>{
+        return await Agent.findOne(
+            {
+                where: { AgentID: AgentID},
+                attributes:  ['ProfileID'] 
+            }
+        )
+    },
 }

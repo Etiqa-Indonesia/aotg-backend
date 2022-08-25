@@ -8,11 +8,6 @@ const Password = decrypt(dbConfig.PASSWORD)
 const DBName = decrypt(dbConfig.DB)
 const HOST = decrypt(dbConfig.HOST)
 
-// var USER = dbConfig.USER
-// const Password = dbConfig.PASSWORD
-// const DBName = dbConfig.DB
-// const HOST = dbConfig.HOST
-
 const sequelize = new Sequelize(DBName, USER, Password, {
     host: HOST,
     dialect: dbConfig.dialect,
@@ -61,5 +56,6 @@ db.PlateCode = require("./platecode.model")(sequelize, Sequelize);
 db.VehicleType = require("./vehicletype.model")(sequelize, Sequelize);
 db.VTAllowed = require("./vtallowed.model")(sequelize, Sequelize);
 db.Invoices = require("./invoices.model")(sequelize, Sequelize);
+db.ErrorLog = require("./error.log.model")(sequelize, Sequelize);
 
 module.exports = db;

@@ -20,6 +20,7 @@ const { decrypt, encrypt } = require('../auth/encrypt')
 const { createLogBO } = require('../services/userlog.service')
 const { TrackEvent, InvoiceMidtrans } = require('../services/global.service')
 
+
 var transporter = nodemailer.createTransport({
     host: config.mailHost,
     port: config.mailPort,
@@ -27,7 +28,11 @@ var transporter = nodemailer.createTransport({
     auth: {
         user: config.mailUser,
         pass: config.mailPass
-    }
+    },
+    tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false
+    },
 });
 
 const readHTMLFile = function (path, callback) {

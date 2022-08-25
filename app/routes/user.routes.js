@@ -1,19 +1,19 @@
 module.exports = app => {
     const user = require("../controllers/user.controller.js");
     const userbo = require('../controllers/backoffice/backoffice.controller')
-    const { checktoken,validateCaptcha, keyReturnCaptcha, refreshtoken } = require("../auth/token_validation")
+    const { checktoken,validateCaptcha, keyReturnCaptcha, refreshtoken,validatetoken } = require("../auth/token_validation")
     const {testSendMail} = require("../services/test.service")
     const { decrypt, encrypt } = require('../auth/encrypt')
 
     let router = require("express").Router();
 
     // Routes
-    router.post("/createuser",checktoken, user.createUser);
-    router.post("/createagent",checktoken, user.createAgent);
+    router.post("/createuser",validatetoken, user.createUser);
+    router.post("/createagent",validatetoken, user.createAgent);
     router.post("/resetpassword", user.forgotPassword);
-    router.post("/updatepassword",checktoken, user.updatePassword);
+    router.post("/updatepassword",validatetoken, user.updatePassword);
 
-    router.get("/:id",checktoken, user.findUser);
+    router.get("/:id",validatetoken, user.findUser);
 
     router.post("/login", user.getLogin);
     router.post("/backoffice/login", validateCaptcha, user.getLoginBO);
@@ -23,10 +23,10 @@ module.exports = app => {
     //router.get("/logout/invalidatetoken", user.getlogoutBackoffice);
     router.get("/token/validate",  user.validateBackofficeToken);
 
-    router.get("/encrypt/:text",checktoken,  user.encrypt);
-    router.get("/decrypt/:text",checktoken,  user.decrypt);
+    router.get("/encrypt/:text",validatetoken,  user.encrypt);
+    router.get("/decrypt/:text",validatetoken,  user.decrypt);
 
-    router.get("/paymenturl/invoice",  checktoken, user.InvoiceMidtrans);
+    router.get("/paymenturl/invoice",  validatetoken, user.InvoiceMidtrans);
     // router.post("/test",  testSendMail);
 
     //Prefix

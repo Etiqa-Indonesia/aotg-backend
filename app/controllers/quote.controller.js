@@ -1,7 +1,7 @@
 const db = require("../models");
 const Quote = db.Quotation;
 const Op = db.Sequelize.Op;
-const { createCoverageDetail, createQuote, createQuoteLogBackOffice, 
+const { createCoverageDetail, createQuote, createQuoteLogBackOffice,
     createQuoteLog, createQuoteDetail, checkExistCustomer, createCustomer, updateCustomer,
     updateFrontView, updateBackView, updateLeftView, updateRightView,
     createorupdateCustomer, updateCustomerQuotation,
@@ -15,7 +15,9 @@ const { SendMail, SendMailDraftQuptation, SendMailDraftQuoteUsingID } = require(
 const { findMarketingEmailByAgentID } = require('../services/agenthandler.service');
 const { findPlateCode } = require('../services/platecode.service');
 const { sendMail, FindToproUsed } = require('../services/global.service')
-const { findAgentType } = require('../services/agent.service')
+const { findAgentType, findAgentProfile } = require('../services/agent.service')
+const { EIICareUser } = require('../services/global.service')
+const SaveProfile = require("../models/care/saveprofile.model")
 
 const multer = require('multer');
 const path = require("path");
@@ -23,7 +25,7 @@ const fs = require('fs');
 const url = require('url');
 const maxSize = 4 * 1024 * 1024;
 const Policy = require('../models/care/savepolicy.model');
-const mw = require('../mw/motor/mw.motor.client');
+const MwClient = require('../mw/motor/mw.motor.client');
 const { User } = require("../models");
 const DIRFRONT = path.join(__dirname, '../../uploads/frontview');
 const DIRBACK = path.join(__dirname, '../../uploads/backview');
@@ -42,6 +44,7 @@ const DirHTMLMailCreateQuote = path.join(__dirname, '../mail/createquotation.htm
 const config = require('../config/db.config');
 const sharp = require('sharp');
 const dbConfig = require("../config/db.config");
+const { saveSysUser } = require("../mw/motor/mw.motor.client");
 // const sendmail = require("../services/test.service");
 
 
@@ -161,9 +164,9 @@ exports.ApproveQuote = async (req, res) => {
     urlobj.host = req.get('host');
     var requrl = url.format(urlobj);
 
-    ApproveQuoteByPK(datasend, (err, results) => {
-        createQuoteLogBackOffice(dataQuolog);
-        updateQuotationforQuoteBackOffice(dataQuolog);
+    ApproveQuoteByPK(datasend, async (err, results) => {
+        await createQuoteLogBackOffice(dataQuolog);
+        await updateQuotationforQuoteBackOffice(dataQuolog);
         if (err) {
             res.status(400).send({
                 status: 400,
@@ -173,58 +176,49 @@ exports.ApproveQuote = async (req, res) => {
         else {
             var ResponseCareUser = null;
             var ResponseCarePolicy = null;
-            SaveUser(JSON.stringify(results.UserSys), (err, resUser) => {
+            const resultsysuser = await MwClient.saveSysUser(JSON.stringify(results.UserSys))
+            SaveCareLog(JSON.stringify(resultsysuser.data), resultsysuser.data.code, req.params.id, results.UserSys, config.saveUserCareURl)
+            const resultuserProfile = await MwClient.saveProfile(JSON.stringify(results.UserProfile))
+            SaveCareLog(JSON.stringify(resultuserProfile.data), resultuserProfile.data.code, req.params.id, results.UserProfile, config.saveProfileCareURl)
+            await SavePolicy(JSON.stringify(results.PolicyData), (err, resultPolicy) => {
                 if (err) {
-                    const Response = "Error Cek Param yang dikirim & Save User gagal dilakukan";
+                    const Response = "Error Cek Param yang dikirim & Save Policy gagal dilakukan";
                     const Status = 422;
-                    SaveCareLog(Response, Status, req.params.id, results.UserSys, config.saveUserCareURl);
+                    SaveCareLog(Response, Status, req.params.id, results.PolicyData, config.savePolicyCareURL);
                 }
                 else {
-                    ResponseCareUser = resUser.data;
-                    SaveCareLog(JSON.stringify(ResponseCareUser), ResponseCareUser.code,
-                        req.params.id, results.UserSys, config.saveUserCareURl);
+                    ResponseCarePolicy = resultPolicy.data;
+                    SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
+                        req.params.id, results.PolicyData, config.savePolicyCareURL);
+                    const paramUpdate = {
+                        PolicyNo: ResponseCarePolicy.Data[0].PolicyNo,
+                        RefferenceNumber: ResponseCarePolicy.Data[0].RefNo,
+                        CarePolicyID: ResponseCarePolicy.Data[0].PID
+                    }
+                    updateQuotationforPolicy(req.params.id, paramUpdate);
+                    const paramSubmitPolicy = {
+                        PID: ResponseCarePolicy.Data[0].PID
+                    }
 
-                    SavePolicy(JSON.stringify(results.PolicyData), (err, resultPolicy) => {
+                    SubmitPolicy(JSON.stringify(paramSubmitPolicy), (err, resultSubPolicy) => {
                         if (err) {
-                            const Response = "Error Cek Param yang dikirim & Save Policy gagal dilakukan";
+                            const Response = "Error Cek Param yang dikirim & Submit Policy gagal dilakukan";
                             const Status = 422;
-                            SaveCareLog(Response, Status, req.params.id, results.PolicyData, config.savePolicyCareURL);
+                            SaveCareLog(Response, Status, req.params.id, JSON.stringify(paramSubmitPolicy), config.submitPolicyCareURL);
                         }
                         else {
-                            ResponseCarePolicy = resultPolicy.data;
+                            ResponseCarePolicy = resultSubPolicy.data;
                             SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
-                                req.params.id, results.PolicyData, config.savePolicyCareURL);
+                                req.params.id, paramSubmitPolicy, config.submitPolicyCareURL);
                             const paramUpdate = {
-                                PolicyNo: ResponseCarePolicy.Data[0].PolicyNo,
-                                RefferenceNumber: ResponseCarePolicy.Data[0].RefNo,
-                                CarePolicyID: ResponseCarePolicy.Data[0].PID
+                                IsSubmittedCare: 1
                             }
-                            updateQuotationforPolicy(req.params.id, paramUpdate);
-                            const paramSubmitPolicy = {
-                                PID: ResponseCarePolicy.Data[0].PID
-                            }
-
-                            SubmitPolicy(JSON.stringify(paramSubmitPolicy), (err, resultSubPolicy) => {
-                                if (err) {
-                                    const Response = "Error Cek Param yang dikirim & Submit Policy gagal dilakukan";
-                                    const Status = 422;
-                                    SaveCareLog(Response, Status, req.params.id, JSON.stringify(paramSubmitPolicy), config.submitPolicyCareURL);
-                                }
-                                else {
-                                    ResponseCarePolicy = resultSubPolicy.data;
-                                    SaveCareLog(JSON.stringify(ResponseCarePolicy), ResponseCarePolicy.code,
-                                        req.params.id, paramSubmitPolicy, config.submitPolicyCareURL);
-                                    const paramUpdate = {
-                                        IsSubmittedCare: 1
-                                    }
-                                    updateQuotationforSubmitPolicy(req.params.id, paramUpdate);
-                                }
-
-                            });
+                            updateQuotationforSubmitPolicy(req.params.id, paramUpdate);
                         }
 
                     });
                 }
+
             });
             res.status(200).send({
                 status: 200,
@@ -284,8 +278,7 @@ exports.CreateQuote = async (req, res) => {
     urlobj.protocol = req.protocol;
     urlobj.host = req.get('host');
     var requrl = url.format(urlobj);
-
-
+    const AgentCheck = await findAgentProfile(req.body.agentid)
 
     const QuotationID = req.body.quotationid;
     const PremiumDetails = req.body.premium_details;
@@ -303,8 +296,8 @@ exports.CreateQuote = async (req, res) => {
     const ToproParamBasedOnYear = year - VehicleDetails.manufactured_year
     const AgentType = await findAgentType(req.body.agentid)
     var ToproIsUsed;
-
-    if (ToproParamBasedOnYear > 5 || dbConfig.truckType.indexOf(PrintData.type.toLowerCase()) !== -1) {
+    //untuk type agent != R
+    if (AgentType.Type !== 'R' && (ToproParamBasedOnYear > 5 || dbConfig.truckType.indexOf(PrintData.type.toLowerCase()) !== -1)) {
         const result = await FindToproUsed(PrintData.type, AgentType.Type, KompreOrTLO)
         ToproIsUsed = result.Topro
     }
@@ -463,9 +456,31 @@ exports.CreateQuote = async (req, res) => {
                         console.log(error)
                     }
                 }
-                createorupdateCustomer(dataCustomer, (err, resultsC) => {
+                createorupdateCustomer(dataCustomer, async (err, resultsC) => {
                     updateCustomerQuotation(QuotationID, resultsC);
                     customerresult = resultsC;
+                    // const IDCheck = req.body.agentid + dataCustomer.IDNo + resultsC
+                    // const paramCheckProfileMW = {
+                    //     ID: EIICareUser('', IDCheck)
+                    // }
+                    // // const resultProfileMW = await MwClient.SearchProfile(paramCheckProfileMW)
+
+                    // // if (resultProfileMW.data.code === 400) {
+                    // SaveProfile.ID = EIICareUser('', IDCheck)
+                    // SaveProfile.BirthDate = dataCustomer.BirthDate
+                    // SaveProfile.Email = dataCustomer.Email
+                    // SaveProfile.ID_Name = dataCustomer.CustomerName
+                    // SaveProfile.ID_No = EIICareUser('', IDCheck)
+                    // SaveProfile.ID_Type = dataCustomer.IDType
+                    // SaveProfile.Name = dataCustomer.CustomerName
+                    // SaveProfile.Mobile = dataCustomer.PhoneNo
+                    // SaveProfile.Address_1 = dataCustomer.Address
+                    // SaveProfile.Gender = dataCustomer.Gender
+                    // SaveProfile.AID = AgentCheck.ProfileID
+
+                    // //const abc = await MwClient.saveProfile(SaveProfile) //saveprofile 
+                    // console.log(abc.data)
+                    // // }
 
                 });
                 const DataUpdate = {
@@ -478,22 +493,22 @@ exports.CreateQuote = async (req, res) => {
                 DataSendMail.QuotationID = QuotationID;
                 // console.log(DataLog)
 
-                createResponseLog(DataLog);
-                updateQuoteDetail(dataVehicle);
+                await createResponseLog(DataLog);
+                await updateQuoteDetail(dataVehicle);
                 const dataQuolog = {
                     QuotationID: QuotationID,
                     Remarks: "Resubmit Quote",
                     Status: dataQuotes.Status,
                     UserID: req.body.userid
                 };
-                
 
-                createQuoteLogBackOffice(dataQuolog);
-                updateCoverageDetail(PremiumDetails, QuotationID,
+
+                await createQuoteLogBackOffice(dataQuolog);
+                await updateCoverageDetail(PremiumDetails, QuotationID,
                     req.body.sum_insured_1, req.body.discount_pct);
 
                 if (dataQuotes.Status == "0")
-                    SendMail(DataSendMail);
+                    await SendMail(DataSendMail);
 
 
                 res.status(200).send({
@@ -523,17 +538,39 @@ exports.CreateQuote = async (req, res) => {
                         }
                         //await SendMailDraftQuptation(data.customer_detail.email, 'Premium Calculation Vehicle', outputpdf, DIRDRAFTQUOT, data, 'Send Draft Calculation Quote')
                     }
-                    createorupdateCustomer(dataCustomer, (err, resultsC) => {
-                        updateCustomerQuotation(results.QuotationID, resultsC);
+                    createorupdateCustomer(dataCustomer, async (err, resultsC) => {
+                        await updateCustomerQuotation(results.QuotationID, resultsC);
                         customerresult = resultsC;
+
+                        // const IDCheck = req.body.agentid + dataCustomer.IDNo + resultsC
+                        // const paramCheckProfileMW = {
+                        //     ID: EIICareUser('', IDCheck)
+                        // }
+                        // // const resultProfileMW = await MwClient.SearchProfile(paramCheckProfileMW)
+
+                        // // if (resultProfileMW.data.code === 400) {
+                        // SaveProfile.ID = EIICareUser('', IDCheck)
+                        // SaveProfile.BirthDate = dataCustomer.BirthDate
+                        // SaveProfile.Email = dataCustomer.Email
+                        // SaveProfile.ID_Name = dataCustomer.CustomerName
+                        // SaveProfile.ID_No = EIICareUser('', IDCheck)
+                        // SaveProfile.ID_Type = dataCustomer.IDType
+                        // SaveProfile.Name = dataCustomer.CustomerName
+                        // SaveProfile.Mobile = dataCustomer.PhoneNo
+                        // SaveProfile.Address_1 = dataCustomer.Address
+                        // SaveProfile.Gender = dataCustomer.Gender
+                        // SaveProfile.AID = AgentCheck.ProfileID
+
+                        // //await MwClient.saveProfile(SaveProfile)
+                        // // }
 
                     });
                     dataVehicle.QuotationID = results.QuotationID;
                     DataSendMail.QuotationID = results.QuotationID;
                     DataLog.QuotationID = results.QuotationID;
                     DataLog.Response = JSON.stringify(results);
-                    createResponseLog(DataLog);
-                    createQuoteDetail(dataVehicle);
+                    await createResponseLog(DataLog);
+                    await createQuoteDetail(dataVehicle);
                     //createQuoteLog(results);
 
                     const dataQuolog = {
@@ -543,11 +580,11 @@ exports.CreateQuote = async (req, res) => {
                         UserID: req.body.userid
                     };
 
-                    createQuoteLogBackOffice(dataQuolog);
+                    await createQuoteLogBackOffice(dataQuolog);
                     if (dataQuotes.Status == "0")
                         SendMail(DataSendMail);
 
-                    createCoverageDetail(PremiumDetails, results.QuotationID,
+                    await createCoverageDetail(PremiumDetails, results.QuotationID,
                         req.body.sum_insured_1, req.body.discount_pct);
 
                     await res.status(200).send({

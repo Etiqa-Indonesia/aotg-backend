@@ -147,6 +147,7 @@ module.exports = {
     },
     findAllAgent: async () => {
         return await Agent.findAll({
+            where: { Status: 1 },
         })
     },
     findDetailAgent: async (data) => {
@@ -210,6 +211,7 @@ module.exports = {
     },
     findAllUser: async () => {
         return await User.findAll({
+            where: { isActive: 1 },
             attributes: { exclude: ['Password', 'CreateDate', 'UpdateDate'] },
         })
     },
