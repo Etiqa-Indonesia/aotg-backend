@@ -47,7 +47,7 @@ module.exports = {
     mailUser: 'aotgnoreply@etiqa.co.id',
     //mailPass: '@A0tgM4il',
     mailPass: '%40A0tgM4il',
-
+    mailClaim: 'claims.etiqa.co.id',
     
 
     // mailHost: "esa.etiqa.co.id",
