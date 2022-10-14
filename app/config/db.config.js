@@ -15,7 +15,7 @@ module.exports = {
         acquire: 30000, // maximum time, in milliseconds, that pool will try to get connection before throwing error
         idle: 10000 // maximum time, in milliseconds, that a connection can be idle before being released
     },
-
+    configExample:'',
     key: "E58740943C7A4A8C40463BA00C2132B6A6131FB832F2F32FC738EA4B62CD4249", //key is keys
     keyCaptcha :"6LciDrkbAAAAAElaHKXiQnBdP2g4zgU9ib8KEjLj",
     siteKeyCaptcha : "6LciDrkbAAAAAFkcqXvi5rcbuDWJhgFOHkI_JJCm",
